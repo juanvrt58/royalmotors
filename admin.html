@@ -347,7 +347,7 @@ function setTab(tab) {
 ════════════════════════════════════ */
 async function loadVehiculos() {
   if (isSupa) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('vehicles')
       .select('*')
       .order('created_at', { ascending: false });
