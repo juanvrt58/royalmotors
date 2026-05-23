@@ -231,7 +231,7 @@ const CATS   = [['alto_valor','Alto Valor'],['valor_medio','Valor Medio']];
 /* ════════════════════════════════════
    AUTENTICACIÓN
 ════════════════════════════════════ */
-const supabaseReady = supabase && SUPABASE_URL !== 'https://saaghanbiydtvficvjsk.supabase.co';
+const supabaseReady = supabaseClient && SUPABASE_URL !== 'https://saaghanbiydtvficvjsk.supabase.co';
 
 async function init() {
   if (!supabaseReady) {
