@@ -7,7 +7,7 @@
 // ════════════════════════════════════════
 // IMPORTANTE: Reemplaza estos valores con los tuyos (ver MANUAL.md)
 const SUPABASE_URL = 'https://saaghanbiydtvficvjsk.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_0sWCBMsfBAmxfLs2RFVFMA_aNR7RzqE';
+const SUPABASE_ANON_KEY = 'sb_publishable_15ibc-HQ1JODV7i7dqqIFw_pkfx4dLF';
 
 // Inicializar cliente de Supabase (se carga desde CDN en cada HTML)
 const supabaseClient = window.supabase
