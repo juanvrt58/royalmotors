@@ -13,7 +13,7 @@ const SUPABASE_URL = 'https://saaghanbiydtvficvjsk.supabase.co';
 //  3. Bajo "Project API keys" copia la fila "anon" "public"
 //  4. El valor correcto SIEMPRE empieza con "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 //  5. Reemplaza la línea de abajo con ese valor
-const SUPABASE_ANON_KEY = 'PEGA_AQUI_LA_ANON_KEY_QUE_EMPIEZA_CON_eyJ';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhYWdoYW5iaXlkdHZmaWN2anNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0ODE4MDEsImV4cCI6MjA5NTA1NzgwMX0.YKkBYrd7Os6xV7qIbx9zi3FcqLRmIJGXOA6gP2Ff8tY';
 
 // Inicializar cliente de Supabase (se carga desde CDN en cada HTML)
 const supabaseClient = window.supabase
