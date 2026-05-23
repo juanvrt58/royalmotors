@@ -6,11 +6,11 @@
 // CONFIGURACIÓN DE SUPABASE
 // ════════════════════════════════════════
 // IMPORTANTE: Reemplaza estos valores con los tuyos (ver MANUAL.md)
-const SUPABASE_URL = 'https://TU-PROYECTO.supabase.co';
-const SUPABASE_ANON_KEY = 'TU_ANON_KEY_AQUI';
+const SUPABASE_URL = 'https://saaghanbiydtvficvjsk.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_0sWCBMsfBAmxfLs2RFVFMA_aNR7RzqE';
 
 // Inicializar cliente de Supabase (se carga desde CDN en cada HTML)
-const supabase = window.supabase
+const supabaseClient = window.supabase
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
   : null;
 
@@ -18,12 +18,12 @@ const supabase = window.supabase
 // CONFIGURACIÓN DE LA EMPRESA
 // ════════════════════════════════════════
 const RM_CONFIG = {
-  whatsappNumber: '56912345678',              // Sin el "+" — formato internacional
+  whatsappNumber: '+56937003368',              // Sin el "+" — formato internacional
   whatsappDefaultMsg: 'Hola, me interesa un vehículo de Royal Motors',
-  email: 'contacto@royalmotors.cl',
-  emailHR: 'rrhh@royalmotors.cl',
+  email: 'contactoroyalmotors@gmail.com',
+  emailHR: 'contactoroyalmotors@gmail.com',
   location: 'Viña del Mar & Santiago, Chile',
-  phone: '+56 9 1234 5678',
+  phone: '+56 9 37003368',
   hours: 'Lunes a Viernes: 9:00 — 19:00\nSábados: 10:00 — 14:00',
 };
 
@@ -193,9 +193,9 @@ function renderWhatsAppFloat() {
 // ════════════════════════════════════════
 async function loadCars() {
   // Si Supabase está configurado, traer de la DB
-  if (supabase && SUPABASE_URL !== 'https://TU-PROYECTO.supabase.co') {
+ if (supabaseClient && SUPABASE_URL !== 'https://TU-PROYECTO.supabase.co'){
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseClient
         .from('vehicles')
         .select('*')
         .order('created_at', { ascending: false });
