@@ -625,77 +625,120 @@ function closeForm() {
   imgs = [];
   document.getElementById('formContainer').innerHTML = '';
 }
-
 /* ════════════════════════════════════
-   GESTOR DE IMÁGENES
+   GESTOR DE IMÁGENES — multi-foto
 ════════════════════════════════════ */
 function renderImgManager() {
   const section = document.getElementById('imgSection');
+
   section.innerHTML = `
     <div class="img-manager">
-      <div class="img-manager-title">Imágenes del Vehículo (${imgs.length})</div>
-
-      <!-- URL externa -->
-      <div class="img-url-input">
-        <input class="form-input" id="imgUrl" placeholder="Pegar URL de imagen (https://...)">
-        <button class="img-url-add" onclick="addImgUrl()">Agregar URL</button>
-      </div>
-
-      <!-- Zona de arrastre / subida -->
-      <div class="img-dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
-        <div class="img-dropzone-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 16V4m0 0l-4 4m4-4l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 17v2a1 1 0 001 1h14a1 1 0 001-1v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div class="img-manager-title" style="margin:0">
+          Fotos del Vehículo
+          ${imgs.length ? `<span style="color:var(--gold);margin-left:6px">(${imgs.length})</span>` : ''}
         </div>
-        <div class="img-dropzone-text">Arrastra fotos aquí o haz clic para seleccionar</div>
-        <div class="img-dropzone-sub">${isSupa ? 'Las fotos se suben a Supabase Storage' : 'Modo demo: se guardan temporalmente'}</div>
-      </div>
-      <input type="file" id="fileInput" accept="image/*" multiple style="display:none" onchange="handleFiles(this.files)">
-
-      <div id="uploadProgress" style="display:none" class="upload-progress">
-        <span class="spinner" style="border-top-color:var(--gold);border-color:rgba(200,169,110,.3)"></span>
-        <span id="uploadMsg">Subiendo...</span>
+        ${imgs.length ? '<span style="font-size:11px;color:var(--gray);letter-spacing:0.5px">La primera foto es la portada</span>' : ''}
       </div>
 
-      <!-- Vista previa -->
+      <!-- Zona drag & drop -->
+      <div class="img-dropzone" id="dropzone">
+        <div class="img-dropzone-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+            <path d="M12 16V4m0 0l-4 4m4-4l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 17v2a1 1 0 001 1h14a1 1 0 001-1v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="img-dropzone-text">Arrastra fotos aquí o haz clic</div>
+        <div class="img-dropzone-sub">Puedes seleccionar varias a la vez · ${isSupa ? 'Se suben a Supabase Storage' : 'Modo demo'}</div>
+      </div>
+      <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
+
+      <!-- Barra de progreso -->
+      <div id="uploadProgress" style="display:none;margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg-card-2);border:1px solid var(--border)">
+          <span class="spinner" style="border-color:rgba(200,169,110,.25);border-top-color:var(--gold)"></span>
+          <span id="uploadMsg" style="font-size:13px;color:var(--gold)">Subiendo...</span>
+        </div>
+        <div style="height:3px;background:var(--border);margin-top:2px">
+          <div id="uploadBar" style="height:100%;background:var(--gold);width:0%;transition:width .3s"></div>
+        </div>
+      </div>
+
+      <!-- Agregar por URL -->
+      <div class="img-url-input" style="margin-bottom:${imgs.length?'16px':'0'}">
+        <input class="form-input" id="imgUrl" placeholder="O pega una URL de imagen...">
+        <button class="img-url-add" id="btnAddUrl">Agregar URL</button>
+      </div>
+
+      <!-- Grid de fotos -->
       ${imgs.length ? `
-        <div class="img-list">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px">
           ${imgs.map((url, i) => `
-            <div class="img-item">
-              <img src="${url}" alt="Imagen ${i+1}" onerror="this.style.opacity='.3'">
-              ${i===0 ? '<div class="img-item-primary">Principal</div>' : ''}
-              <div class="img-item-actions">
-                <button class="img-item-btn del" onclick="removeImg(${i})" title="Eliminar">
-                  <svg width="11" height="11" viewBox="0 0 14 14" fill="none"><path d="M2 4h10M5 4V2h4v2M3 4l1 9h6l1-9" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div style="position:relative;aspect-ratio:4/3;background:var(--bg-card-2);border:2px solid ${i===0?'var(--gold)':'var(--border)'}">
+              <img src="${url}" alt="Foto ${i+1}"
+                style="width:100%;height:100%;object-fit:cover;display:block"
+                onerror="this.style.opacity='.2'">
+
+              <!-- Número -->
+              <div style="position:absolute;bottom:0;left:0;background:rgba(0,0,0,.65);
+                color:${i===0?'var(--gold)':'white'};font-size:10px;padding:2px 7px;
+                letter-spacing:.5px;font-weight:${i===0?700:400}">
+                ${i===0?'PORTADA':`#${i+1}`}
+              </div>
+
+              <!-- Acciones -->
+              <div style="position:absolute;top:0;right:0;display:flex;gap:1px">
+                ${i > 0 ? `
+                  <button onclick="moveImg(${i},-1)" title="Mover a la izquierda"
+                    style="background:rgba(0,0,0,.7);border:none;color:white;width:26px;height:26px;
+                    display:flex;align-items:center;justify-content:center;cursor:pointer">
+                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M8 6H4m0 0l3-3M4 6l3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                ` : ''}
+                ${i < imgs.length-1 ? `
+                  <button onclick="moveImg(${i},1)" title="Mover a la derecha"
+                    style="background:rgba(0,0,0,.7);border:none;color:white;width:26px;height:26px;
+                    display:flex;align-items:center;justify-content:center;cursor:pointer">
+                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M4 6h4m0 0L5 3m3 3L5 9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                ` : ''}
+                <button onclick="removeImg(${i})" title="Eliminar foto"
+                  style="background:rgba(139,32,32,.85);border:none;color:white;width:26px;height:26px;
+                  display:flex;align-items:center;justify-content:center;cursor:pointer">
+                  <svg width="10" height="10" viewBox="0 0 14 14" fill="none"><path d="M2 4h10M5 4V2h4v2M3 4l1 9h6l1-9" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
               </div>
-              ${imgs.length > 1 ? `
-                <div class="img-item-order">
-                  <button onclick="moveImg(${i},-1)" ${i===0?'disabled':''} title="Mover antes">
-                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 10V2m0 0L2 6m4-4l4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  </button>
-                  <button onclick="moveImg(${i},1)" ${i===imgs.length-1?'disabled':''} title="Mover después">
-                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 2v8m0 0l4-4m-4 4L2 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  </button>
-                </div>
-              ` : ''}
             </div>
           `).join('')}
         </div>
-      ` : '<p style="color:var(--gray);font-size:13px;margin-top:8px">Sin imágenes aún. La primera que agregues será la imagen principal.</p>'}
+        <p style="font-size:11px;color:var(--gray);margin-top:8px">
+          Arrastra más fotos para agregar · Usa las flechas para reordenar · La primera siempre es la portada
+        </p>
+      ` : `<p style="font-size:13px;color:var(--gray);text-align:center;padding:8px 0">
+              Aún no hay fotos. Arrastra imágenes o pega una URL arriba.
+           </p>`}
     </div>
   `;
 
-  // Drag & drop
+  // Drag & drop sobre la zona
   const dz = document.getElementById('dropzone');
-  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+  const fi = document.getElementById('fileInput');
+  dz.addEventListener('click', () => fi.click());
+  dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('dragover'); });
   dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
-  dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
+  dz.addEventListener('drop',      e => { e.preventDefault(); dz.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
+  fi.addEventListener('change', e => handleFiles(e.target.files));
+
+  // URL
+  document.getElementById('btnAddUrl').addEventListener('click', addImgUrl);
+  document.getElementById('imgUrl').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addImgUrl(); } });
 }
 
 function addImgUrl() {
   const input = document.getElementById('imgUrl');
-  const url = input.value.trim();
-  if (!url.startsWith('http')) { toast('Ingresa una URL válida (http...)', true); return; }
+  const url   = input.value.trim();
+  if (!url.startsWith('http')) { toast('Ingresa una URL válida (https://...)', true); return; }
   imgs.push(url);
   input.value = '';
   renderImgManager();
@@ -717,38 +760,43 @@ async function handleFiles(files) {
   const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
   if (!imageFiles.length) return;
 
-  const prog = document.getElementById('uploadProgress');
-  const msg  = document.getElementById('uploadMsg');
-  prog.style.display = 'flex';
+  const prog    = document.getElementById('uploadProgress');
+  const msgEl   = document.getElementById('uploadMsg');
+  const barEl   = document.getElementById('uploadBar');
+  prog.style.display = 'block';
 
   for (let i = 0; i < imageFiles.length; i++) {
-    msg.textContent = `Subiendo imagen ${i+1} de ${imageFiles.length}...`;
+    msgEl.textContent = `Subiendo foto ${i+1} de ${imageFiles.length}…`;
+    barEl.style.width = `${Math.round((i / imageFiles.length) * 100)}%`;
     try {
       if (isSupa) {
-        // Subir a Supabase Storage
         const file = imageFiles[i];
-        const ext  = file.name.split('.').pop().toLowerCase().replace(/jpeg/,'jpg');
+        const ext  = file.name.split('.').pop().toLowerCase().replace('jpeg','jpg');
         const name = `${Date.now()}-${Math.random().toString(36).slice(2,6)}.${ext}`;
-        const { error } = await supabaseClient.storage.from('vehicle-images').upload(name, file, { upsert: false });
+        const { error } = await supabaseClient.storage
+          .from('vehicle-images').upload(name, file, { upsert: false });
         if (error) throw error;
-        const { data: { publicUrl } } = supabaseClient.storage.from('vehicle-images').getPublicUrl(name);
+        const { data: { publicUrl } } = supabaseClient.storage
+          .from('vehicle-images').getPublicUrl(name);
         imgs.push(publicUrl);
       } else {
-        // Demo: usar base64
+        // Demo: base64
         await new Promise(resolve => {
-          const reader = new FileReader();
-          reader.onload = e => { imgs.push(e.target.result); resolve(); };
-          reader.readAsDataURL(imageFiles[i]);
+          const r = new FileReader();
+          r.onload = e => { imgs.push(e.target.result); resolve(); };
+          r.readAsDataURL(imageFiles[i]);
         });
       }
     } catch (err) {
-      toast('Error subiendo imagen: ' + err.message, true);
+      toast('Error subiendo foto ' + (i+1) + ': ' + err.message, true);
     }
   }
 
-  prog.style.display = 'none';
+  barEl.style.width = '100%';
+  setTimeout(() => { prog.style.display = 'none'; barEl.style.width = '0'; }, 400);
   renderImgManager();
 }
+
 
 /* ════════════════════════════════════
    EVENT LISTENERS
