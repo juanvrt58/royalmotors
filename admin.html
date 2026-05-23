@@ -9,660 +9,781 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* Admin extra */
+    .admin-wrap { display: flex; min-height: 100vh; background: var(--bg); }
+    .side-spacer { flex: 1; }
+
+    /* Spinner */
+    .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.3); border-top-color: white; border-radius: 50%; animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Modo demo banner */
+    .demo-banner { background: rgba(200,169,110,.12); border: 1px solid rgba(200,169,110,.3); border-radius: 0; padding: 10px 20px; font-size: 13px; color: var(--gold); text-align: center; }
+
+    /* Table responsive */
+    .table-wrap { overflow-x: auto; }
+
+    /* Form helper text */
+    .field-hint { font-size: 11px; color: var(--gray); margin-top: 4px; }
+
+    /* Image upload progress */
+    .upload-progress { background: var(--bg-card-2); border: 1px solid var(--border); padding: 10px 14px; font-size: 13px; color: var(--gold); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+  </style>
 </head>
 <body>
 
-  <!-- ═══════════════════════════════════════
-       VISTA 1: LOGIN
-       ═══════════════════════════════════════ -->
-  <div id="loginView" class="admin-login" style="display:none">
-    <div class="login-box">
-      <div class="login-title">ROYAL MOTORS</div>
-      <div class="login-sub" id="loginSub">Panel de Administración</div>
+<!-- ══════════════════════════════════════════
+     PANTALLA DE LOGIN
+     Visible por defecto — se reemplaza al autenticar
+═══════════════════════════════════════════ -->
+<div id="loginScreen" class="admin-login">
+  <div class="login-box">
+    <div class="login-title">ROYAL MOTORS</div>
+    <p class="login-sub" id="loginSubtitle">Panel de Administración</p>
 
-      <div id="loginError" class="login-error" style="display:none"></div>
-      <div id="loginSuccess" class="login-success" style="display:none"></div>
+    <div id="loginAlert" style="display:none" class="login-error"></div>
+    <div id="loginOk" style="display:none" class="login-success"></div>
 
-      <!-- Formulario de login -->
-      <div id="loginForm">
-        <div class="form-group">
-          <label class="form-label" for="loginEmail">Correo electrónico</label>
-          <input class="form-input" type="email" id="loginEmail" placeholder="admin@royalmotors.cl">
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="loginPass">Contraseña</label>
-          <input class="form-input" type="password" id="loginPass" placeholder="Contraseña">
-        </div>
-        <button class="btn-gold" id="btnLogin" style="width:100%;margin-bottom:12px">Ingresar</button>
-        <div style="display:flex;justify-content:space-between;font-size:13px">
-          <button class="nav-link" id="btnShowReset">¿Olvidaste tu contraseña?</button>
-          <a href="index.html" class="nav-link">Volver al sitio</a>
-        </div>
+    <!-- FORM: Login -->
+    <div id="formLogin">
+      <div class="form-group">
+        <label class="form-label" for="fEmail">Correo electrónico</label>
+        <input class="form-input" id="fEmail" type="email" placeholder="admin@royalmotors.cl" autocomplete="email">
       </div>
-
-      <!-- Formulario de reset -->
-      <div id="resetForm" style="display:none">
-        <div class="form-group">
-          <label class="form-label" for="resetEmail">Correo electrónico</label>
-          <input class="form-input" type="email" id="resetEmail" placeholder="admin@royalmotors.cl">
-        </div>
-        <button class="btn-gold" id="btnReset" style="width:100%;margin-bottom:12px">Enviar enlace de restablecimiento</button>
-        <button class="nav-link" id="btnBackToLogin" style="width:100%;text-align:center">Volver al login</button>
+      <div class="form-group">
+        <label class="form-label" for="fPass">Contraseña</label>
+        <input class="form-input" id="fPass" type="password" placeholder="Tu contraseña" autocomplete="current-password">
+      </div>
+      <button class="btn-gold" id="btnLogin" style="width:100%;margin-bottom:16px;justify-content:center">
+        Ingresar
+      </button>
+      <div style="display:flex;justify-content:space-between;font-size:13px">
+        <button class="nav-link" id="linkReset" style="color:var(--gray)">¿Olvidaste la contraseña?</button>
+        <a href="index.html" class="nav-link" style="color:var(--gray)">Volver al sitio</a>
       </div>
     </div>
+
+    <!-- FORM: Reset password -->
+    <div id="formReset" style="display:none">
+      <div class="form-group">
+        <label class="form-label" for="fResetEmail">Correo electrónico</label>
+        <input class="form-input" id="fResetEmail" type="email" placeholder="admin@royalmotors.cl">
+      </div>
+      <button class="btn-gold" id="btnSendReset" style="width:100%;margin-bottom:12px;justify-content:center">
+        Enviar enlace de recuperación
+      </button>
+      <button class="nav-link" id="linkBackLogin" style="display:block;text-align:center;color:var(--gray);font-size:13px">
+        Volver al login
+      </button>
+    </div>
   </div>
+</div>
 
-  <!-- ═══════════════════════════════════════
-       VISTA 2: DASHBOARD
-       ═══════════════════════════════════════ -->
-  <div id="dashboardView" class="dashboard" style="display:none">
-    <aside class="dash-side">
-      <a href="index.html" class="dash-side-logo">ROYAL MOTORS</a>
-      <button class="dash-menu-item active" id="menuCars" data-tab="cars"></button>
-      <button class="dash-menu-item" id="menuAdd"></button>
-      <button class="dash-menu-item" id="menuPassword" data-tab="password"></button>
-      <div style="flex:1"></div>
-      <a href="index.html" class="dash-menu-item"></a>
-      <button class="dash-menu-item" id="btnLogout"></button>
-    </aside>
+<!-- ══════════════════════════════════════════
+     DASHBOARD (oculto hasta autenticar)
+═══════════════════════════════════════════ -->
+<div id="dashScreen" class="admin-wrap" style="display:none">
 
-    <main class="dash-main">
-      <!-- ── TAB: VEHÍCULOS ── -->
-      <div id="tabCars">
-        <div class="dash-stats" id="statsGrid"></div>
-        <div class="dash-header">
-          <h1 class="dash-title">Gestión de Vehículos</h1>
-          <button class="btn-gold" id="btnNewCar"></button>
-        </div>
-        <div id="formContainer"></div>
-        <div style="overflow-x:auto">
-          <table class="data-table" id="carsTable">
-            <thead>
-              <tr>
-                <th style="width:50px"></th>
-                <th>Vehículo</th>
-                <th>Año</th>
-                <th>Precio</th>
-                <th>Categoría</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody id="carsTableBody"></tbody>
-          </table>
-          <div id="emptyCars" style="display:none;text-align:center;padding:60px;color:var(--gray)">
-            <p style="font-size:16px;margin-bottom:8px">No hay vehículos en el inventario</p>
-            <p style="font-size:14px">Comienza agregando tu primer vehículo.</p>
-          </div>
-        </div>
+  <!-- SIDEBAR -->
+  <aside class="dash-side">
+    <a href="index.html" class="dash-side-logo" style="display:block;text-decoration:none">ROYAL MOTORS</a>
+
+    <button class="dash-menu-item active" id="menuVehiculos">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none"><path d="M3 11l1.5-5h9L15 11M2 11h14v4H2v-4z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><circle cx="5" cy="15" r="1.5" stroke="currentColor" stroke-width="1"/><circle cx="13" cy="15" r="1.5" stroke="currentColor" stroke-width="1"/></svg>
+      Vehículos
+    </button>
+    <button class="dash-menu-item" id="menuAgregar">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Agregar Vehículo
+    </button>
+    <button class="dash-menu-item" id="menuPassword">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none"><rect x="3" y="8" width="12" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M6 8V5a3 3 0 016 0v3" stroke="currentColor" stroke-width="1.3"/></svg>
+      Cambiar Contraseña
+    </button>
+
+    <div class="side-spacer"></div>
+
+    <a href="index.html" class="dash-menu-item" style="text-decoration:none">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.2"/><path d="M2 9h14M9 2c2 2.5 2 11 0 14M9 2c-2 2.5-2 11 0 14" stroke="currentColor" stroke-width="1.2"/></svg>
+      Ver Sitio Web
+    </a>
+    <button class="dash-menu-item" id="btnLogout">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none"><path d="M12 5l4 4-4 4M16 9H6M6 2H3v14h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Cerrar Sesión
+    </button>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="dash-main">
+    <div id="demoBanner" class="demo-banner" style="display:none;margin:-32px -40px 32px -40px">
+      Modo demostración — Supabase no configurado. Los cambios no se guardan permanentemente. Edita <code>js/app.js</code> con tus credenciales.
+    </div>
+
+    <!-- TAB: VEHÍCULOS -->
+    <div id="tabVehiculos">
+      <!-- Stats -->
+      <div class="dash-stats" id="statsRow">
+        <div class="dash-stat"><div class="dash-stat-num" id="statTotal">0</div><div class="dash-stat-label">Total</div></div>
+        <div class="dash-stat"><div class="dash-stat-num" id="statAvail">0</div><div class="dash-stat-label">Disponibles</div></div>
+        <div class="dash-stat"><div class="dash-stat-num" id="statSold">0</div><div class="dash-stat-label">Vendidos</div></div>
+        <div class="dash-stat"><div class="dash-stat-num" id="statFeat">0</div><div class="dash-stat-label">Destacados</div></div>
       </div>
 
-      <!-- ── TAB: CAMBIAR CONTRASEÑA ── -->
-      <div id="tabPassword" style="display:none">
-        <div class="dash-header"><h1 class="dash-title">Cambiar Contraseña</h1></div>
-        <div class="admin-form" style="max-width:480px">
-          <div id="passMsg" style="display:none"></div>
-          <div class="form-group">
-            <label class="form-label">Nueva contraseña</label>
-            <input class="form-input" type="password" id="newPass">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Confirmar contraseña</label>
-            <input class="form-input" type="password" id="confirmPass">
-          </div>
-          <button class="btn-gold" id="btnChangePass">Guardar Contraseña</button>
+      <!-- Header -->
+      <div class="dash-header">
+        <h1 class="dash-title">Gestión de Vehículos</h1>
+        <button class="btn-gold" id="btnNuevoTop">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Agregar Vehículo
+        </button>
+      </div>
+
+      <!-- Formulario (se inyecta aquí) -->
+      <div id="formContainer"></div>
+
+      <!-- Tabla -->
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width:54px"></th>
+              <th>Vehículo</th>
+              <th>Año</th>
+              <th>Precio</th>
+              <th>Categoría</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="carsTableBody"></tbody>
+        </table>
+        <div id="emptyMsg" style="display:none;text-align:center;padding:60px 20px;color:var(--gray)">
+          <p style="font-size:16px;margin-bottom:8px">Sin vehículos en el inventario</p>
+          <p style="font-size:13px">Usa el botón "Agregar Vehículo" para comenzar.</p>
         </div>
       </div>
-    </main>
-  </div>
+    </div>
 
-  <!-- ═══════════════════════════════════════
-       SCRIPTS
-       ═══════════════════════════════════════ -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/app.js"></script>
-  <script>
-    // Preparar íconos de menú
-    document.getElementById('menuCars').innerHTML = ICONS.car + ' Vehículos';
-    document.getElementById('menuAdd').innerHTML = ICONS.plus + ' Agregar Vehículo';
-    document.getElementById('menuPassword').innerHTML = ICONS.lock + ' Cambiar Contraseña';
-    document.querySelectorAll('a.dash-menu-item')[0].innerHTML = ICONS.globe + ' Ver Sitio Web';
-    document.getElementById('btnLogout').innerHTML = ICONS.logout + ' Cerrar Sesión';
-    document.getElementById('btnNewCar').innerHTML = ICONS.plus + ' Agregar Vehículo';
+    <!-- TAB: CONTRASEÑA -->
+    <div id="tabPassword" style="display:none">
+      <div class="dash-header"><h1 class="dash-title">Cambiar Contraseña</h1></div>
+      <div class="admin-form" style="max-width:460px">
+        <div id="passAlert" style="display:none;margin-bottom:16px"></div>
+        <div class="form-group">
+          <label class="form-label">Nueva contraseña</label>
+          <input class="form-input" type="password" id="newPass1" placeholder="Mínimo 6 caracteres">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirmar contraseña</label>
+          <input class="form-input" type="password" id="newPass2">
+        </div>
+        <button class="btn-gold" id="btnGuardaPass">Guardar Contraseña</button>
+      </div>
+    </div>
+  </main>
+</div>
 
-    // ════════════════════════════════════════
-    // ESTADO GLOBAL
-    // ════════════════════════════════════════
-    let currentCars = [];
-    let editingCarId = null;
+<!-- Toast -->
+<div id="globalToast" style="display:none" class="toast"></div>
 
-    const emptyForm = {
-      brand: '', model: '', year: 2024, price: '',
-      category: 'alto_valor', type: 'SUV',
-      images: [], description: '',
-      whatsapp: RM_CONFIG.whatsappNumber,
-      featured: false, status: 'available',
-      specs: { motor: '', hp: '', transmision: '', combustible: '', km: '', color: '', traccion: '' }
-    };
+<!-- ══════════════════════════════════════════
+     SCRIPTS
+═══════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/app.js"></script>
+<script>
+/* ════════════════════════════════════
+   UTILIDADES UI
+════════════════════════════════════ */
+const toast = (msg, isError) => {
+  const el = document.getElementById('globalToast');
+  el.innerHTML = `<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> ${msg}`;
+  el.style.display = 'flex';
+  el.style.background = isError ? 'var(--red)' : 'var(--gold)';
+  el.style.color = isError ? 'white' : 'var(--bg)';
+  setTimeout(() => { el.style.display = 'none'; }, 3500);
+};
 
-    // ════════════════════════════════════════
-    // AUTENTICACIÓN — Supabase
-    // ════════════════════════════════════════
-    async function checkAuth() {
-      if (!supabase || SUPABASE_URL === 'https://TU-PROYECTO.supabase.co') {
-        showLogin('Supabase no configurado. Edita js/app.js con tus credenciales.');
-        return;
-      }
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        showDashboard();
-      } else {
-        showLogin();
-      }
+const showAlert = (elId, msg, isOk) => {
+  const el = document.getElementById(elId);
+  el.className = isOk ? 'login-success' : 'login-error';
+  el.textContent = msg;
+  el.style.display = 'block';
+};
+
+const hideAlert = (elId) => {
+  document.getElementById(elId).style.display = 'none';
+};
+
+/* ════════════════════════════════════
+   ESTADO GLOBAL
+════════════════════════════════════ */
+let DB = [];      // vehículos en memoria
+let editId = null;
+let imgs = [];    // imágenes del form activo
+let isSupa = false; // si Supabase está activo
+
+const BRANDS = ['Porsche','BMW','Mercedes-Benz','Audi','Land Rover','Lexus','Volvo','Toyota','Hyundai','Kia'];
+const TYPES  = ['SUV','Sedán','Deportivo','Coupé','Pickup','Hatchback'];
+const CATS   = [['alto_valor','Alto Valor'],['valor_medio','Valor Medio']];
+
+/* ════════════════════════════════════
+   AUTENTICACIÓN
+════════════════════════════════════ */
+const supabaseReady = supabase && SUPABASE_URL !== 'https://TU-PROYECTO.supabase.co';
+
+async function init() {
+  if (!supabaseReady) {
+    // MODO DEMO: entrar directo sin login
+    document.getElementById('demoBanner').style.display = 'block';
+    isSupa = false;
+    DB = [...SAMPLE_CARS];
+    enterDashboard();
+    return;
+  }
+
+  isSupa = true;
+
+  // Revisar sesión existente
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) {
+    enterDashboard();
+  }
+  // Si no hay sesión, el login ya está visible por defecto
+
+  // Escuchar cambios de sesión (ej: después de reset de contraseña)
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' || event === 'PASSWORD_RECOVERY') {
+      enterDashboard();
     }
+  });
+}
 
-    function showLogin(warning) {
-      document.getElementById('loginView').style.display = 'flex';
-      document.getElementById('dashboardView').style.display = 'none';
-      if (warning) {
-        const err = document.getElementById('loginError');
-        err.textContent = warning;
-        err.style.display = 'block';
-      }
+async function doLogin() {
+  const email = document.getElementById('fEmail').value.trim();
+  const pass  = document.getElementById('fPass').value;
+  hideAlert('loginAlert');
+
+  if (!email || !pass) {
+    showAlert('loginAlert', 'Completa email y contraseña.', false); return;
+  }
+  if (!supabaseReady) {
+    showAlert('loginAlert', 'Supabase no configurado. Edita js/app.js con tus credenciales.', false); return;
+  }
+
+  const btn = document.getElementById('btnLogin');
+  btn.innerHTML = '<span class="spinner"></span> Ingresando...';
+  btn.disabled = true;
+
+  const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
+
+  btn.innerHTML = 'Ingresar';
+  btn.disabled = false;
+
+  if (error) {
+    showAlert('loginAlert', 'Credenciales incorrectas.', false);
+  } else {
+    enterDashboard();
+  }
+}
+
+async function doLogout() {
+  if (isSupa) await supabase.auth.signOut();
+  document.getElementById('dashScreen').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('fPass').value = '';
+}
+
+async function doReset() {
+  const email = document.getElementById('fResetEmail').value.trim();
+  hideAlert('loginAlert');
+  if (!email) { showAlert('loginAlert', 'Ingresa tu correo.', false); return; }
+  if (!supabaseReady) { showAlert('loginAlert', 'Supabase no configurado.', false); return; }
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.href
+  });
+  if (error) showAlert('loginAlert', error.message, false);
+  else showAlert('loginOk', 'Revisa tu correo. Te enviamos el enlace de recuperación.', true);
+}
+
+async function doChangePass() {
+  const p1 = document.getElementById('newPass1').value;
+  const p2 = document.getElementById('newPass2').value;
+  const alert = (msg, ok) => showAlert('passAlert', msg, ok);
+  if (!p1) { alert('Ingresa la nueva contraseña.', false); return; }
+  if (p1 !== p2) { alert('Las contraseñas no coinciden.', false); return; }
+  if (p1.length < 6) { alert('Mínimo 6 caracteres.', false); return; }
+  if (!isSupa) { alert('Disponible solo con Supabase configurado.', false); return; }
+  const { error } = await supabase.auth.updateUser({ password: p1 });
+  if (error) alert(error.message, false);
+  else {
+    alert('Contraseña actualizada correctamente.', true);
+    document.getElementById('newPass1').value = '';
+    document.getElementById('newPass2').value = '';
+  }
+}
+
+/* ════════════════════════════════════
+   DASHBOARD
+════════════════════════════════════ */
+function enterDashboard() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('dashScreen').style.display = 'flex';
+  loadVehiculos();
+}
+
+function setTab(tab) {
+  ['tabVehiculos','tabPassword'].forEach(id => {
+    document.getElementById(id).style.display = id === `tab${tab}` ? 'block' : 'none';
+  });
+  document.querySelectorAll('.dash-menu-item').forEach(b => b.classList.remove('active'));
+  const menuMap = { Vehiculos: 'menuVehiculos', Password: 'menuPassword' };
+  if (menuMap[tab]) document.getElementById(menuMap[tab]).classList.add('active');
+}
+
+/* ════════════════════════════════════
+   CRUD VEHÍCULOS
+════════════════════════════════════ */
+async function loadVehiculos() {
+  if (isSupa) {
+    const { data, error } = await supabase
+      .from('vehicles')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) { toast('Error: ' + error.message, true); return; }
+    DB = (data || []).map(v => ({ ...v, images: v.images||[], specs: v.specs||{} }));
+  }
+  renderStats();
+  renderTabla();
+}
+
+function renderStats() {
+  document.getElementById('statTotal').textContent = DB.length;
+  document.getElementById('statAvail').textContent = DB.filter(c => c.status==='available').length;
+  document.getElementById('statSold').textContent  = DB.filter(c => c.status==='sold').length;
+  document.getElementById('statFeat').textContent  = DB.filter(c => c.featured).length;
+}
+
+function renderTabla() {
+  const tbody = document.getElementById('carsTableBody');
+  const empty = document.getElementById('emptyMsg');
+  if (!DB.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  tbody.innerHTML = DB.map(car => `
+    <tr>
+      <td>
+        ${car.images?.[0]
+          ? `<img class="table-img" src="${car.images[0]}" alt="" onerror="this.style.opacity='.3'">`
+          : `<div class="table-img" style="background:var(--bg-card-2)"></div>`}
+      </td>
+      <td>
+        <strong style="color:var(--white)">${car.brand}</strong>
+        <span style="color:var(--gray)"> ${car.model}</span>
+        ${car.featured ? '<span style="background:var(--gold);color:var(--bg);font-size:9px;padding:1px 6px;margin-left:6px;font-weight:700;letter-spacing:1px;text-transform:uppercase">Destacado</span>' : ''}
+      </td>
+      <td>${car.year}</td>
+      <td style="color:var(--gold);font-weight:600">${fmtPrice(car.price)}</td>
+      <td style="font-size:12px;color:var(--gray)">${car.category==='alto_valor'?'Alto Valor':'Valor Medio'}</td>
+      <td>
+        <span class="status">
+          <span class="status-dot ${car.status}"></span>
+          ${car.status==='available'?'Disponible':'Vendido'}
+        </span>
+      </td>
+      <td>
+        <div class="table-actions">
+          <button class="table-btn" onclick="abrirForm('${car.id}')">
+            <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M10 2l2 2-8 8H2v-2l8-8z" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/></svg>
+            Editar
+          </button>
+          <button class="table-btn" onclick="toggleStatus('${car.id}')">
+            ${car.status==='available'?'Marcar Vendido':'Marcar Disponible'}
+          </button>
+          <button class="table-btn delete" onclick="eliminarAuto('${car.id}')">
+            <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M2 4h10M5 4V2h4v2M3 4l1 9h6l1-9" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function toggleStatus(id) {
+  const car = DB.find(c => String(c.id) === String(id));
+  if (!car) return;
+  const ns = car.status === 'available' ? 'sold' : 'available';
+  if (isSupa) {
+    const { error } = await supabase.from('vehicles').update({ status: ns }).eq('id', id);
+    if (error) { toast('Error: ' + error.message, true); return; }
+  } else {
+    car.status = ns;
+  }
+  toast(ns === 'sold' ? 'Marcado como vendido' : 'Marcado como disponible');
+  loadVehiculos();
+}
+
+async function eliminarAuto(id) {
+  const car = DB.find(c => String(c.id) === String(id));
+  if (!car || !confirm(`¿Eliminar ${car.brand} ${car.model}? Esta acción no se puede deshacer.`)) return;
+  if (isSupa) {
+    // Eliminar imágenes del storage si son de Supabase
+    const storageUrls = (car.images||[]).filter(u => u.includes('/storage/v1/object/public/'));
+    if (storageUrls.length) {
+      const paths = storageUrls.map(u => { const m = u.match(/vehicle-images\/(.+)$/); return m?m[1]:null; }).filter(Boolean);
+      if (paths.length) await supabase.storage.from('vehicle-images').remove(paths);
     }
+    const { error } = await supabase.from('vehicles').delete().eq('id', id);
+    if (error) { toast('Error: ' + error.message, true); return; }
+  } else {
+    DB = DB.filter(c => String(c.id) !== String(id));
+  }
+  toast('Vehículo eliminado');
+  closeForm();
+  loadVehiculos();
+}
 
-    function showDashboard() {
-      document.getElementById('loginView').style.display = 'none';
-      document.getElementById('dashboardView').style.display = 'flex';
-      loadDashboardData();
+async function guardarAuto() {
+  const brand = document.getElementById('fb_brand').value;
+  const model = document.getElementById('fb_model').value.trim();
+  const price = document.getElementById('fb_price').value;
+  if (!brand || !model || !price) { toast('Completa marca, modelo y precio', true); return; }
+
+  const specs = {};
+  document.querySelectorAll('[data-spec]').forEach(el => { specs[el.dataset.spec] = el.value.trim(); });
+
+  const payload = {
+    brand, model,
+    year:        parseInt(document.getElementById('fb_year').value) || 2024,
+    price:       parseInt(price) || 0,
+    category:    document.getElementById('fb_category').value,
+    type:        document.getElementById('fb_type').value,
+    status:      document.getElementById('fb_status').value,
+    whatsapp:    document.getElementById('fb_whatsapp').value.trim() || RM_CONFIG.whatsappNumber,
+    description: document.getElementById('fb_description').value.trim(),
+    featured:    document.getElementById('fb_featured').checked,
+    images:      [...imgs],
+    specs
+  };
+
+  const btn = document.getElementById('btnGuardar');
+  btn.disabled = true;
+  btn.textContent = 'Guardando...';
+
+  if (isSupa) {
+    let error;
+    if (editId) {
+      ({ error } = await supabase.from('vehicles').update(payload).eq('id', editId));
+    } else {
+      ({ error } = await supabase.from('vehicles').insert([payload]));
     }
-
-    async function doLogin() {
-      const email = document.getElementById('loginEmail').value.trim();
-      const pass = document.getElementById('loginPass').value;
-      const errEl = document.getElementById('loginError');
-      errEl.style.display = 'none';
-
-      if (!supabase || SUPABASE_URL === 'https://TU-PROYECTO.supabase.co') {
-        errEl.textContent = 'Supabase no configurado. Revisa el manual.';
-        errEl.style.display = 'block';
-        return;
-      }
-
-      const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
-      if (error) {
-        errEl.textContent = 'Credenciales incorrectas.';
-        errEl.style.display = 'block';
-      } else {
-        showDashboard();
-      }
+    if (error) {
+      toast('Error: ' + error.message, true);
+      btn.disabled = false;
+      btn.textContent = editId ? 'Guardar Cambios' : 'Agregar Vehículo';
+      return;
     }
-
-    async function doLogout() {
-      if (supabase) await supabase.auth.signOut();
-      location.reload();
+  } else {
+    // Demo: manipular array local
+    if (editId) {
+      const idx = DB.findIndex(c => String(c.id) === String(editId));
+      if (idx !== -1) DB[idx] = { ...DB[idx], ...payload };
+    } else {
+      DB.unshift({ ...payload, id: Date.now().toString(36), created_at: new Date().toISOString() });
     }
+  }
 
-    async function doReset() {
-      const email = document.getElementById('resetEmail').value.trim();
-      const errEl = document.getElementById('loginError');
-      const okEl = document.getElementById('loginSuccess');
-      errEl.style.display = 'none';
-      okEl.style.display = 'none';
+  toast(editId ? 'Vehículo actualizado' : 'Vehículo agregado al inventario');
+  closeForm();
+  loadVehiculos();
+}
 
-      if (!email) {
-        errEl.textContent = 'Ingresa tu correo electrónico.';
-        errEl.style.display = 'block';
-        return;
-      }
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.origin + window.location.pathname
-      });
-      if (error) {
-        errEl.textContent = error.message;
-        errEl.style.display = 'block';
-      } else {
-        okEl.textContent = 'Se ha enviado un correo con instrucciones.';
-        okEl.style.display = 'block';
-      }
-    }
+/* ════════════════════════════════════
+   FORMULARIO DE AUTO
+════════════════════════════════════ */
+function abrirForm(id) {
+  editId = id || null;
+  const car = id ? (DB.find(c => String(c.id) === String(id)) || {}) : {};
+  imgs = [...(car.images || [])];
 
-    async function changePassword() {
-      const newP = document.getElementById('newPass').value;
-      const confP = document.getElementById('confirmPass').value;
-      const msg = document.getElementById('passMsg');
-      msg.style.display = 'block';
-      if (newP !== confP) { msg.className = 'login-error'; msg.textContent = 'Las contraseñas no coinciden.'; return; }
-      if (newP.length < 6) { msg.className = 'login-error'; msg.textContent = 'Mínimo 6 caracteres.'; return; }
-      const { error } = await supabase.auth.updateUser({ password: newP });
-      if (error) {
-        msg.className = 'login-error'; msg.textContent = error.message;
-      } else {
-        msg.className = 'login-success'; msg.textContent = 'Contraseña actualizada exitosamente.';
-        document.getElementById('newPass').value = '';
-        document.getElementById('confirmPass').value = '';
-      }
-    }
+  const specs = car.specs || {};
 
-    // ════════════════════════════════════════
-    // CRUD DE VEHÍCULOS — Supabase
-    // ════════════════════════════════════════
-    async function loadDashboardData() {
-      const { data, error } = await supabase
-        .from('vehicles')
-        .select('*')
-        .order('created_at', { ascending: false });
-      if (error) {
-        showToast('Error cargando vehículos: ' + error.message);
-        currentCars = [];
-      } else {
-        currentCars = (data || []).map(v => ({
-          ...v, images: v.images || [], specs: v.specs || {}
-        }));
-      }
-      renderStats();
-      renderCarsTable();
-    }
+  document.getElementById('formContainer').innerHTML = `
+    <div class="admin-form" id="carForm">
+      <h3 style="font-family:var(--font-display);font-size:20px;margin-bottom:24px">
+        ${editId ? 'Editar Vehículo' : 'Nuevo Vehículo'}
+      </h3>
 
-    function renderStats() {
-      const total = currentCars.length;
-      const avail = currentCars.filter(c => c.status === 'available').length;
-      const sold = currentCars.filter(c => c.status === 'sold').length;
-      const feat = currentCars.filter(c => c.featured).length;
-      document.getElementById('statsGrid').innerHTML = `
-        <div class="dash-stat"><div class="dash-stat-num">${total}</div><div class="dash-stat-label">Total Vehículos</div></div>
-        <div class="dash-stat"><div class="dash-stat-num">${avail}</div><div class="dash-stat-label">Disponibles</div></div>
-        <div class="dash-stat"><div class="dash-stat-num">${sold}</div><div class="dash-stat-label">Vendidos</div></div>
-        <div class="dash-stat"><div class="dash-stat-num">${feat}</div><div class="dash-stat-label">Destacados</div></div>
-      `;
-    }
+      <div class="admin-form-grid">
 
-    function renderCarsTable() {
-      const tbody = document.getElementById('carsTableBody');
-      const empty = document.getElementById('emptyCars');
-      if (!currentCars.length) {
-        tbody.innerHTML = '';
-        empty.style.display = 'block';
-        document.getElementById('carsTable').style.display = 'none';
-        return;
-      }
-      empty.style.display = 'none';
-      document.getElementById('carsTable').style.display = '';
-      tbody.innerHTML = currentCars.map(car => `
-        <tr>
-          <td>${car.images?.[0] ? `<img class="table-img" src="${car.images[0]}" alt="">` : `<div class="table-img" style="background:var(--bg-card-2)"></div>`}</td>
-          <td><strong style="color:var(--white)">${car.brand}</strong> <span style="color:var(--gray)">${car.model}</span></td>
-          <td>${car.year}</td>
-          <td style="color:var(--gold);font-weight:600">${fmtPrice(car.price)}</td>
-          <td style="font-size:12px">${car.category === 'alto_valor' ? 'Alto Valor' : 'Valor Medio'}</td>
-          <td><span class="status"><span class="status-dot ${car.status}"></span>${car.status === 'available' ? 'Disponible' : 'Vendido'}</span></td>
-          <td>
-            <div class="table-actions">
-              <button class="table-btn" data-action="edit" data-id="${car.id}">${ICONS.edit} Editar</button>
-              <button class="table-btn" data-action="toggle" data-id="${car.id}">${car.status === 'available' ? 'Marcar Vendido' : 'Marcar Disponible'}</button>
-              <button class="table-btn delete" data-action="delete" data-id="${car.id}">${ICONS.trash}</button>
-            </div>
-          </td>
-        </tr>
-      `).join('');
+        <!-- Marca -->
+        <div>
+          <label class="form-label">Marca *</label>
+          <select class="form-select" id="fb_brand">
+            <option value="">Seleccionar...</option>
+            ${BRANDS.map(b => `<option value="${b}" ${car.brand===b?'selected':''}>${b}</option>`).join('')}
+          </select>
+        </div>
 
-      tbody.querySelectorAll('button[data-action]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const id = btn.dataset.id;
-          const action = btn.dataset.action;
-          const car = currentCars.find(c => String(c.id) === String(id));
-          if (!car) return;
-          if (action === 'edit') openForm(car);
-          if (action === 'toggle') toggleStatus(car);
-          if (action === 'delete') deleteCar(car);
-        });
-      });
-    }
+        <!-- Modelo -->
+        <div>
+          <label class="form-label">Modelo *</label>
+          <input class="form-input" id="fb_model" value="${car.model||''}" placeholder="Ej: Cayenne S">
+        </div>
 
-    async function toggleStatus(car) {
-      const newStatus = car.status === 'available' ? 'sold' : 'available';
-      const { error } = await supabase.from('vehicles').update({ status: newStatus }).eq('id', car.id);
-      if (error) { showToast('Error: ' + error.message); return; }
-      showToast(newStatus === 'sold' ? 'Marcado como vendido' : 'Marcado como disponible');
-      loadDashboardData();
-    }
+        <!-- Año -->
+        <div>
+          <label class="form-label">Año</label>
+          <input class="form-input" id="fb_year" type="number" value="${car.year||2024}" min="2000" max="2030">
+        </div>
 
-    async function deleteCar(car) {
-      if (!confirm(`¿Eliminar ${car.brand} ${car.model}? Esta acción no se puede deshacer.`)) return;
-      // Si tiene imágenes en Supabase Storage, borrarlas también
-      const storageImages = (car.images || []).filter(url => url.includes('/storage/v1/object/public/'));
-      if (storageImages.length) {
-        const paths = storageImages.map(url => {
-          const m = url.match(/vehicle-images\/(.+)$/);
-          return m ? m[1] : null;
-        }).filter(Boolean);
-        if (paths.length) await supabase.storage.from('vehicle-images').remove(paths);
-      }
-      const { error } = await supabase.from('vehicles').delete().eq('id', car.id);
-      if (error) { showToast('Error: ' + error.message); return; }
-      showToast('Vehículo eliminado');
-      loadDashboardData();
-    }
+        <!-- Precio -->
+        <div>
+          <label class="form-label">Precio (CLP) *</label>
+          <input class="form-input" id="fb_price" type="number" value="${car.price||''}" placeholder="45000000">
+          <p class="field-hint">Sin puntos ni comas. Ej: 45000000</p>
+        </div>
 
-    async function saveCar(formData) {
-      if (!formData.brand || !formData.model || !formData.price) {
-        showToast('Completa marca, modelo y precio');
-        return false;
-      }
-      const payload = {
-        brand: formData.brand,
-        model: formData.model,
-        year: parseInt(formData.year) || 2024,
-        price: parseInt(formData.price) || 0,
-        category: formData.category,
-        type: formData.type,
-        images: formData.images,
-        description: formData.description,
-        whatsapp: formData.whatsapp,
-        featured: formData.featured,
-        status: formData.status,
-        specs: formData.specs
-      };
-      let error;
-      if (editingCarId) {
-        ({ error } = await supabase.from('vehicles').update(payload).eq('id', editingCarId));
-      } else {
-        ({ error } = await supabase.from('vehicles').insert([payload]));
-      }
-      if (error) { showToast('Error: ' + error.message); return false; }
-      showToast(editingCarId ? 'Vehículo actualizado' : 'Vehículo agregado');
-      return true;
-    }
+        <!-- Categoría -->
+        <div>
+          <label class="form-label">Categoría</label>
+          <select class="form-select" id="fb_category">
+            ${CATS.map(([v,l]) => `<option value="${v}" ${car.category===v?'selected':''}>${l}</option>`).join('')}
+          </select>
+        </div>
 
-    // ════════════════════════════════════════
-    // SUBIR IMÁGENES A SUPABASE STORAGE
-    // ════════════════════════════════════════
-    async function uploadImage(file) {
-      const ext = file.name.split('.').pop().toLowerCase();
-      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2,7)}.${ext}`;
-      const { error } = await supabase.storage
-        .from('vehicle-images')
-        .upload(fileName, file, { cacheControl: '3600', upsert: false });
-      if (error) throw error;
-      const { data: { publicUrl } } = supabase.storage.from('vehicle-images').getPublicUrl(fileName);
-      return publicUrl;
-    }
+        <!-- Tipo -->
+        <div>
+          <label class="form-label">Tipo</label>
+          <select class="form-select" id="fb_type">
+            ${TYPES.map(t => `<option value="${t}" ${car.type===t?'selected':''}>${t}</option>`).join('')}
+          </select>
+        </div>
 
-    // ════════════════════════════════════════
-    // FORMULARIO DE AGREGAR/EDITAR
-    // ════════════════════════════════════════
-    function openForm(car) {
-      editingCarId = car ? car.id : null;
-      const data = car
-        ? { ...emptyForm, ...car, images: [...(car.images || [])], specs: { ...emptyForm.specs, ...(car.specs || {}) } }
-        : { ...emptyForm, images: [], specs: { ...emptyForm.specs } };
+        <!-- Estado -->
+        <div>
+          <label class="form-label">Estado</label>
+          <select class="form-select" id="fb_status">
+            <option value="available" ${car.status==='available'||!car.status?'selected':''}>Disponible</option>
+            <option value="sold" ${car.status==='sold'?'selected':''}>Vendido</option>
+          </select>
+        </div>
 
-      const container = document.getElementById('formContainer');
-      container.innerHTML = `
-        <div class="admin-form">
-          <h3 style="font-family:var(--font-display);font-size:20px;margin-bottom:24px">
-            ${editingCarId ? 'Editar Vehículo' : 'Nuevo Vehículo'}
-          </h3>
+        <!-- WhatsApp -->
+        <div>
+          <label class="form-label">WhatsApp</label>
+          <input class="form-input" id="fb_whatsapp" value="${car.whatsapp||RM_CONFIG.whatsappNumber}" placeholder="56912345678">
+          <p class="field-hint">Número sin "+" ni espacios</p>
+        </div>
+
+        <!-- Descripción -->
+        <div class="admin-form-full">
+          <label class="form-label">Descripción</label>
+          <textarea class="form-textarea" id="fb_description" style="height:80px" placeholder="Describe el vehículo: estado, equipamiento, historial...">${car.description||''}</textarea>
+        </div>
+
+        <!-- IMÁGENES -->
+        <div class="admin-form-full">
+          <div id="imgSection"></div>
+        </div>
+
+        <!-- Especificaciones técnicas -->
+        <div class="admin-form-full">
+          <label class="form-label" style="margin-bottom:12px">Especificaciones Técnicas</label>
           <div class="admin-form-grid">
-            <div><label class="form-label">Marca *</label>
-              <select class="form-select" id="fBrand">
-                <option value="">Seleccionar...</option>
-                ${BRANDS.map(b => `<option value="${b}" ${data.brand === b ? 'selected' : ''}>${b}</option>`).join('')}
-              </select>
-            </div>
-            <div><label class="form-label">Modelo *</label>
-              <input class="form-input" id="fModel" value="${data.model}" placeholder="Ej: Cayenne S">
-            </div>
-            <div><label class="form-label">Año</label>
-              <input class="form-input" type="number" id="fYear" value="${data.year}">
-            </div>
-            <div><label class="form-label">Precio (CLP) *</label>
-              <input class="form-input" type="number" id="fPrice" value="${data.price}" placeholder="45000000">
-            </div>
-            <div><label class="form-label">Categoría</label>
-              <select class="form-select" id="fCategory">
-                ${CATEGORIES.map(c => `<option value="${c.v}" ${data.category === c.v ? 'selected' : ''}>${c.l}</option>`).join('')}
-              </select>
-            </div>
-            <div><label class="form-label">Tipo</label>
-              <select class="form-select" id="fType">
-                ${TYPES.map(t => `<option value="${t}" ${data.type === t ? 'selected' : ''}>${t}</option>`).join('')}
-              </select>
-            </div>
-            <div><label class="form-label">Estado</label>
-              <select class="form-select" id="fStatus">
-                <option value="available" ${data.status === 'available' ? 'selected' : ''}>Disponible</option>
-                <option value="sold" ${data.status === 'sold' ? 'selected' : ''}>Vendido</option>
-              </select>
-            </div>
-            <div><label class="form-label">WhatsApp</label>
-              <input class="form-input" id="fWhatsapp" value="${data.whatsapp}" placeholder="56912345678">
-            </div>
-            <div class="admin-form-full">
-              <label class="form-label">Descripción</label>
-              <textarea class="form-textarea" id="fDesc" style="height:80px">${data.description || ''}</textarea>
-            </div>
-            <div class="admin-form-full" id="imgManagerWrap"></div>
-            <div class="admin-form-full">
-              <label class="form-label" style="margin-bottom:12px">Especificaciones Técnicas</label>
-              <div class="admin-form-grid">
-                ${[
-                  ['motor','Motor'],['hp','Potencia (HP)'],['transmision','Transmisión'],
-                  ['combustible','Combustible'],['km','Kilometraje'],['color','Color'],
-                  ['traccion','Tracción']
-                ].map(([k,l]) => `
-                  <div>
-                    <label class="form-label" style="font-size:11px">${l}</label>
-                    <input class="form-input" data-spec="${k}" value="${data.specs[k] || ''}">
-                  </div>
-                `).join('')}
+            ${[['motor','Motor'],['hp','Potencia'],['transmision','Transmisión'],['combustible','Combustible'],['km','Kilometraje'],['color','Color'],['traccion','Tracción']].map(([k,l]) => `
+              <div>
+                <label class="form-label" style="font-size:11px">${l}</label>
+                <input class="form-input" data-spec="${k}" value="${specs[k]||''}" placeholder="${k==='km'?'18.500 km':k==='hp'?'450 HP':''}">
               </div>
-            </div>
-            <div class="admin-form-full">
-              <label style="display:flex;align-items:center;gap:8px;color:var(--gray);font-size:14px;cursor:pointer">
-                <input type="checkbox" id="fFeatured" ${data.featured ? 'checked' : ''}>
-                Marcar como destacado — aparecerá en la página de inicio
-              </label>
-            </div>
-          </div>
-          <div class="admin-form-actions">
-            <button class="btn-outline" id="btnCancel" style="padding:10px 24px">Cancelar</button>
-            <button class="btn-gold" id="btnSave" style="padding:10px 24px">
-              ${editingCarId ? 'Guardar Cambios' : 'Agregar Vehículo'}
-            </button>
+            `).join('')}
           </div>
         </div>
-      `;
 
-      // Render del gestor de imágenes
-      renderImageManager(data.images);
+        <!-- Destacado -->
+        <div class="admin-form-full">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;color:var(--gray)">
+            <input type="checkbox" id="fb_featured" ${car.featured?'checked':''} style="width:16px;height:16px;accent-color:var(--gold)">
+            Vehículo destacado — aparece en la portada
+          </label>
+        </div>
+      </div>
 
-      // Eventos
-      document.getElementById('btnCancel').addEventListener('click', closeForm);
-      document.getElementById('btnSave').addEventListener('click', async () => {
-        const images = window._currentImages || [];
-        const specs = {};
-        container.querySelectorAll('[data-spec]').forEach(el => { specs[el.dataset.spec] = el.value.trim(); });
-        const formData = {
-          brand: document.getElementById('fBrand').value,
-          model: document.getElementById('fModel').value.trim(),
-          year: document.getElementById('fYear').value,
-          price: document.getElementById('fPrice').value,
-          category: document.getElementById('fCategory').value,
-          type: document.getElementById('fType').value,
-          status: document.getElementById('fStatus').value,
-          whatsapp: document.getElementById('fWhatsapp').value.trim(),
-          description: document.getElementById('fDesc').value.trim(),
-          featured: document.getElementById('fFeatured').checked,
-          images, specs
-        };
-        document.getElementById('btnSave').disabled = true;
-        document.getElementById('btnSave').textContent = 'Guardando...';
-        const ok = await saveCar(formData);
-        if (ok) {
-          closeForm();
-          loadDashboardData();
-        } else {
-          document.getElementById('btnSave').disabled = false;
-          document.getElementById('btnSave').textContent = editingCarId ? 'Guardar Cambios' : 'Agregar Vehículo';
-        }
-      });
+      <div class="admin-form-actions">
+        <button class="btn-outline" onclick="closeForm()" style="padding:10px 24px">Cancelar</button>
+        <button class="btn-gold" id="btnGuardar" onclick="guardarAuto()" style="padding:10px 24px">
+          ${editId ? 'Guardar Cambios' : 'Agregar Vehículo'}
+        </button>
+      </div>
+    </div>
+  `;
 
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+  renderImgManager();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-    function closeForm() {
-      editingCarId = null;
-      document.getElementById('formContainer').innerHTML = '';
-      window._currentImages = [];
-    }
+function closeForm() {
+  editId = null;
+  imgs = [];
+  document.getElementById('formContainer').innerHTML = '';
+}
 
-    // ════════════════════════════════════════
-    // GESTOR DE IMÁGENES
-    // ════════════════════════════════════════
-    function renderImageManager(initialImages) {
-      window._currentImages = [...(initialImages || [])];
-      const wrap = document.getElementById('imgManagerWrap');
-      const redraw = () => {
-        const imgs = window._currentImages;
-        wrap.innerHTML = `
-          <div class="img-manager">
-            <div class="img-manager-title">Gestión de Imágenes (${imgs.length})</div>
-            <div class="img-url-input">
-              <input class="form-input" id="imgUrlInput" placeholder="Pegar URL de imagen...">
-              <button class="img-url-add" id="btnAddUrl">Agregar URL</button>
-            </div>
-            <div class="img-dropzone" id="dropzone">
-              <div class="img-dropzone-icon">${ICONS.upload}</div>
-              <div class="img-dropzone-text">Arrastra imágenes aquí o haz clic para seleccionar</div>
-              <div class="img-dropzone-sub">JPG, PNG, WebP — se suben a Supabase Storage</div>
-              <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
-            </div>
-            <div id="uploadStatus" style="display:none;color:var(--gold);font-size:13px;margin-bottom:12px;text-align:center"></div>
-            ${imgs.length ? `
-              <div class="img-list">
-                ${imgs.map((img, i) => `
-                  <div class="img-item">
-                    <img src="${img}" alt="Imagen ${i+1}" onerror="this.style.display='none'">
-                    ${i === 0 ? '<div class="img-item-primary">Principal</div>' : ''}
-                    <div class="img-item-actions">
-                      <button class="img-item-btn del" data-del="${i}" title="Eliminar">${ICONS.trash}</button>
-                    </div>
-                    ${imgs.length > 1 ? `
-                      <div class="img-item-order">
-                        <button data-move="up" data-idx="${i}" ${i === 0 ? 'disabled' : ''}>${ICONS.arrowUp}</button>
-                        <button data-move="down" data-idx="${i}" ${i === imgs.length - 1 ? 'disabled' : ''}>${ICONS.arrowDown}</button>
-                      </div>
-                    ` : ''}
-                  </div>
-                `).join('')}
+/* ════════════════════════════════════
+   GESTOR DE IMÁGENES
+════════════════════════════════════ */
+function renderImgManager() {
+  const section = document.getElementById('imgSection');
+  section.innerHTML = `
+    <div class="img-manager">
+      <div class="img-manager-title">Imágenes del Vehículo (${imgs.length})</div>
+
+      <!-- URL externa -->
+      <div class="img-url-input">
+        <input class="form-input" id="imgUrl" placeholder="Pegar URL de imagen (https://...)">
+        <button class="img-url-add" onclick="addImgUrl()">Agregar URL</button>
+      </div>
+
+      <!-- Zona de arrastre / subida -->
+      <div class="img-dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+        <div class="img-dropzone-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 16V4m0 0l-4 4m4-4l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 17v2a1 1 0 001 1h14a1 1 0 001-1v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="img-dropzone-text">Arrastra fotos aquí o haz clic para seleccionar</div>
+        <div class="img-dropzone-sub">${isSupa ? 'Las fotos se suben a Supabase Storage' : 'Modo demo: se guardan temporalmente'}</div>
+      </div>
+      <input type="file" id="fileInput" accept="image/*" multiple style="display:none" onchange="handleFiles(this.files)">
+
+      <div id="uploadProgress" style="display:none" class="upload-progress">
+        <span class="spinner" style="border-top-color:var(--gold);border-color:rgba(200,169,110,.3)"></span>
+        <span id="uploadMsg">Subiendo...</span>
+      </div>
+
+      <!-- Vista previa -->
+      ${imgs.length ? `
+        <div class="img-list">
+          ${imgs.map((url, i) => `
+            <div class="img-item">
+              <img src="${url}" alt="Imagen ${i+1}" onerror="this.style.opacity='.3'">
+              ${i===0 ? '<div class="img-item-primary">Principal</div>' : ''}
+              <div class="img-item-actions">
+                <button class="img-item-btn del" onclick="removeImg(${i})" title="Eliminar">
+                  <svg width="11" height="11" viewBox="0 0 14 14" fill="none"><path d="M2 4h10M5 4V2h4v2M3 4l1 9h6l1-9" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
               </div>
-            ` : ''}
-          </div>
-        `;
+              ${imgs.length > 1 ? `
+                <div class="img-item-order">
+                  <button onclick="moveImg(${i},-1)" ${i===0?'disabled':''} title="Mover antes">
+                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 10V2m0 0L2 6m4-4l4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                  <button onclick="moveImg(${i},1)" ${i===imgs.length-1?'disabled':''} title="Mover después">
+                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 2v8m0 0l4-4m-4 4L2 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                </div>
+              ` : ''}
+            </div>
+          `).join('')}
+        </div>
+      ` : '<p style="color:var(--gray);font-size:13px;margin-top:8px">Sin imágenes aún. La primera que agregues será la imagen principal.</p>'}
+    </div>
+  `;
 
-        // Eventos
-        document.getElementById('btnAddUrl').addEventListener('click', () => {
-          const v = document.getElementById('imgUrlInput').value.trim();
-          if (v) { window._currentImages.push(v); document.getElementById('imgUrlInput').value = ''; redraw(); }
-        });
-        document.getElementById('imgUrlInput').addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') { e.preventDefault(); document.getElementById('btnAddUrl').click(); }
-        });
+  // Drag & drop
+  const dz = document.getElementById('dropzone');
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+  dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
+}
 
-        const dropzone = document.getElementById('dropzone');
-        const fileInput = document.getElementById('fileInput');
-        dropzone.addEventListener('click', () => fileInput.click());
-        dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
-        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
-        dropzone.addEventListener('drop', (e) => {
-          e.preventDefault(); dropzone.classList.remove('dragover');
-          handleFiles(e.dataTransfer.files);
-        });
-        fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+function addImgUrl() {
+  const input = document.getElementById('imgUrl');
+  const url = input.value.trim();
+  if (!url.startsWith('http')) { toast('Ingresa una URL válida (http...)', true); return; }
+  imgs.push(url);
+  input.value = '';
+  renderImgManager();
+}
 
-        async function handleFiles(files) {
-          const status = document.getElementById('uploadStatus');
-          const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
-          if (!imageFiles.length) return;
-          status.style.display = 'block';
-          status.textContent = `Subiendo ${imageFiles.length} imagen${imageFiles.length>1?'es':''}...`;
-          for (let i = 0; i < imageFiles.length; i++) {
-            try {
-              status.textContent = `Subiendo ${i+1}/${imageFiles.length}...`;
-              const url = await uploadImage(imageFiles[i]);
-              window._currentImages.push(url);
-            } catch (err) {
-              showToast('Error subiendo imagen: ' + err.message);
-            }
-          }
-          status.style.display = 'none';
-          redraw();
-        }
+function removeImg(i) {
+  imgs.splice(i, 1);
+  renderImgManager();
+}
 
-        wrap.querySelectorAll('[data-del]').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const i = parseInt(btn.dataset.del);
-            window._currentImages.splice(i, 1);
-            redraw();
-          });
+function moveImg(i, dir) {
+  const n = i + dir;
+  if (n < 0 || n >= imgs.length) return;
+  [imgs[i], imgs[n]] = [imgs[n], imgs[i]];
+  renderImgManager();
+}
+
+async function handleFiles(files) {
+  const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+  if (!imageFiles.length) return;
+
+  const prog = document.getElementById('uploadProgress');
+  const msg  = document.getElementById('uploadMsg');
+  prog.style.display = 'flex';
+
+  for (let i = 0; i < imageFiles.length; i++) {
+    msg.textContent = `Subiendo imagen ${i+1} de ${imageFiles.length}...`;
+    try {
+      if (isSupa) {
+        // Subir a Supabase Storage
+        const file = imageFiles[i];
+        const ext  = file.name.split('.').pop().toLowerCase().replace(/jpeg/,'jpg');
+        const name = `${Date.now()}-${Math.random().toString(36).slice(2,6)}.${ext}`;
+        const { error } = await supabase.storage.from('vehicle-images').upload(name, file, { upsert: false });
+        if (error) throw error;
+        const { data: { publicUrl } } = supabase.storage.from('vehicle-images').getPublicUrl(name);
+        imgs.push(publicUrl);
+      } else {
+        // Demo: usar base64
+        await new Promise(resolve => {
+          const reader = new FileReader();
+          reader.onload = e => { imgs.push(e.target.result); resolve(); };
+          reader.readAsDataURL(imageFiles[i]);
         });
-        wrap.querySelectorAll('[data-move]').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const i = parseInt(btn.dataset.idx);
-            const dir = btn.dataset.move === 'up' ? -1 : 1;
-            const n = i + dir;
-            if (n < 0 || n >= window._currentImages.length) return;
-            const arr = window._currentImages;
-            [arr[i], arr[n]] = [arr[n], arr[i]];
-            redraw();
-          });
-        });
-      };
-      redraw();
+      }
+    } catch (err) {
+      toast('Error subiendo imagen: ' + err.message, true);
     }
+  }
 
-    // ════════════════════════════════════════
-    // NAVEGACIÓN DE TABS
-    // ════════════════════════════════════════
-    function showTab(tab) {
-      document.getElementById('tabCars').style.display = tab === 'cars' ? 'block' : 'none';
-      document.getElementById('tabPassword').style.display = tab === 'password' ? 'block' : 'none';
-      document.querySelectorAll('.dash-menu-item[data-tab]').forEach(b => b.classList.remove('active'));
-      const menuBtn = document.querySelector(`.dash-menu-item[data-tab="${tab}"]`);
-      if (menuBtn) menuBtn.classList.add('active');
-    }
+  prog.style.display = 'none';
+  renderImgManager();
+}
 
-    // ════════════════════════════════════════
-    // EVENT LISTENERS
-    // ════════════════════════════════════════
-    document.getElementById('btnLogin').addEventListener('click', doLogin);
-    document.getElementById('loginPass').addEventListener('keydown', (e) => { if (e.key === 'Enter') doLogin(); });
-    document.getElementById('btnShowReset').addEventListener('click', () => {
-      document.getElementById('loginForm').style.display = 'none';
-      document.getElementById('resetForm').style.display = 'block';
-      document.getElementById('loginSub').textContent = 'Restablecer contraseña';
-      document.getElementById('loginError').style.display = 'none';
-    });
-    document.getElementById('btnBackToLogin').addEventListener('click', () => {
-      document.getElementById('loginForm').style.display = 'block';
-      document.getElementById('resetForm').style.display = 'none';
-      document.getElementById('loginSub').textContent = 'Panel de Administración';
-      document.getElementById('loginError').style.display = 'none';
-      document.getElementById('loginSuccess').style.display = 'none';
-    });
-    document.getElementById('btnReset').addEventListener('click', doReset);
-    document.getElementById('btnLogout').addEventListener('click', doLogout);
-    document.getElementById('btnNewCar').addEventListener('click', () => openForm(null));
-    document.getElementById('menuCars').addEventListener('click', () => { showTab('cars'); closeForm(); });
-    document.getElementById('menuAdd').addEventListener('click', () => { showTab('cars'); openForm(null); });
-    document.getElementById('menuPassword').addEventListener('click', () => { showTab('password'); closeForm(); });
-    document.getElementById('btnChangePass').addEventListener('click', changePassword);
+/* ════════════════════════════════════
+   EVENT LISTENERS
+════════════════════════════════════ */
+document.getElementById('btnLogin').addEventListener('click', doLogin);
+document.getElementById('fPass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('fEmail').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('fPass').focus(); });
 
-    // ════════════════════════════════════════
-    // INICIAR
-    // ════════════════════════════════════════
-    checkAuth();
-  </script>
+document.getElementById('linkReset').addEventListener('click', () => {
+  document.getElementById('formLogin').style.display = 'none';
+  document.getElementById('formReset').style.display = 'block';
+  document.getElementById('loginSubtitle').textContent = 'Restablecer contraseña';
+  hideAlert('loginAlert'); hideAlert('loginOk');
+});
+document.getElementById('linkBackLogin').addEventListener('click', () => {
+  document.getElementById('formLogin').style.display = 'block';
+  document.getElementById('formReset').style.display = 'none';
+  document.getElementById('loginSubtitle').textContent = 'Panel de Administración';
+  hideAlert('loginAlert'); hideAlert('loginOk');
+});
+document.getElementById('btnSendReset').addEventListener('click', doReset);
+document.getElementById('btnLogout').addEventListener('click', doLogout);
+document.getElementById('btnGuardaPass').addEventListener('click', doChangePass);
+
+document.getElementById('menuVehiculos').addEventListener('click', () => { setTab('Vehiculos'); closeForm(); });
+document.getElementById('menuAgregar').addEventListener('click', () => { setTab('Vehiculos'); abrirForm(null); });
+document.getElementById('menuPassword').addEventListener('click', () => { setTab('Password'); closeForm(); });
+document.getElementById('btnNuevoTop').addEventListener('click', () => abrirForm(null));
+
+/* ════════════════════════════════════
+   ARRANCAR
+════════════════════════════════════ */
+init();
+</script>
 </body>
 </html>
