@@ -7,7 +7,8 @@
 // ════════════════════════════════════════
 // IMPORTANTE: Reemplaza estos valores con los tuyos (ver MANUAL.md)
 const SUPABASE_URL = 'https://saaghanbiydtvficvjsk.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_15ibc-HQ1JODV7i7dqqIFw_pkfx4dLF';
+// ANON KEY: ve a Supabase → Project Settings → API → "anon public" — empieza con eyJ...
+const SUPABASE_ANON_KEY = 'PEGA_AQUI_TU_ANON_KEY_eyJ...';
 
 // Inicializar cliente de Supabase (se carga desde CDN en cada HTML)
 const supabaseClient = window.supabase
@@ -18,7 +19,7 @@ const supabaseClient = window.supabase
 // CONFIGURACIÓN DE LA EMPRESA
 // ════════════════════════════════════════
 const RM_CONFIG = {
-  whatsappNumber: '+56937003368',              // Sin el "+" — formato internacional
+  whatsappNumber: '56937003368',              // Sin el "+" — formato internacional
   whatsappDefaultMsg: 'Hola, me interesa un vehículo de Royal Motors',
   email: 'contactoroyalmotors@gmail.com',
   emailHR: 'contactoroyalmotors@gmail.com',
