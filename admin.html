@@ -228,7 +228,8 @@ let isSupa = false; // si Supabase está activo
 /* ════════════════════════════════════
    AUTENTICACIÓN
 ════════════════════════════════════ */
-const supabaseReady = supabaseClient && SUPABASE_URL !== 'https://saaghanbiydtvficvjsk.supabase.co';
+// "Listo" = el cliente existe Y la URL no es el placeholder original
+const supabaseReady = supabaseClient && SUPABASE_URL !== 'https://TU-PROYECTO.supabase.co';
 
 async function init() {
   if (!supabaseReady) {
