@@ -546,7 +546,7 @@ function abrirForm(id) {
         <div>
           <label class="form-label">Categoría</label>
           <select class="form-select" id="fb_category">
-            ${CATS.map(([v,l]) => `<option value="${v}" ${car.category===v?'selected':''}>${l}</option>`).join('')}
+            ${CATEGORIES.map(c => `<option value="${c.v}" ${car.category===c.v?'selected':''}>${c.l}</option>`).join('')}
           </select>
         </div>
 
