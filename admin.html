@@ -231,7 +231,7 @@ const CATS   = [['alto_valor','Alto Valor'],['valor_medio','Valor Medio']];
 /* ════════════════════════════════════
    AUTENTICACIÓN
 ════════════════════════════════════ */
-const supabaseReady = supabase && SUPABASE_URL !== 'https://TU-PROYECTO.supabase.co';
+const supabaseReady = supabase && SUPABASE_URL !== 'https://saaghanbiydtvficvjsk.supabase.co';
 
 async function init() {
   if (!supabaseReady) {
@@ -246,14 +246,14 @@ async function init() {
   isSupa = true;
 
   // Revisar sesión existente
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session } } = await supabaseClient.auth.getSession();
   if (session) {
     enterDashboard();
   }
   // Si no hay sesión, el login ya está visible por defecto
 
   // Escuchar cambios de sesión (ej: después de reset de contraseña)
-  supabase.auth.onAuthStateChange((event, session) => {
+  supabaseClient.auth.onAuthStateChange((event, session) => {
     if (event === 'SIGNED_IN' || event === 'PASSWORD_RECOVERY') {
       enterDashboard();
     }
@@ -276,7 +276,7 @@ async function doLogin() {
   btn.innerHTML = '<span class="spinner"></span> Ingresando...';
   btn.disabled = true;
 
-  const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
+  const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
 
   btn.innerHTML = 'Ingresar';
   btn.disabled = false;
@@ -289,7 +289,7 @@ async function doLogin() {
 }
 
 async function doLogout() {
-  if (isSupa) await supabase.auth.signOut();
+  if (isSupa) await supabaseClient.auth.signOut();
   document.getElementById('dashScreen').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('fPass').value = '';
@@ -300,7 +300,7 @@ async function doReset() {
   hideAlert('loginAlert');
   if (!email) { showAlert('loginAlert', 'Ingresa tu correo.', false); return; }
   if (!supabaseReady) { showAlert('loginAlert', 'Supabase no configurado.', false); return; }
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+  const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
     redirectTo: window.location.href
   });
   if (error) showAlert('loginAlert', error.message, false);
@@ -315,7 +315,7 @@ async function doChangePass() {
   if (p1 !== p2) { alert('Las contraseñas no coinciden.', false); return; }
   if (p1.length < 6) { alert('Mínimo 6 caracteres.', false); return; }
   if (!isSupa) { alert('Disponible solo con Supabase configurado.', false); return; }
-  const { error } = await supabase.auth.updateUser({ password: p1 });
+  const { error } = await supabaseClient.auth.updateUser({ password: p1 });
   if (error) alert(error.message, false);
   else {
     alert('Contraseña actualizada correctamente.', true);
@@ -414,7 +414,7 @@ async function toggleStatus(id) {
   if (!car) return;
   const ns = car.status === 'available' ? 'sold' : 'available';
   if (isSupa) {
-    const { error } = await supabase.from('vehicles').update({ status: ns }).eq('id', id);
+    const { error } = await supabaseClient.from('vehicles').update({ status: ns }).eq('id', id);
     if (error) { toast('Error: ' + error.message, true); return; }
   } else {
     car.status = ns;
@@ -431,9 +431,9 @@ async function eliminarAuto(id) {
     const storageUrls = (car.images||[]).filter(u => u.includes('/storage/v1/object/public/'));
     if (storageUrls.length) {
       const paths = storageUrls.map(u => { const m = u.match(/vehicle-images\/(.+)$/); return m?m[1]:null; }).filter(Boolean);
-      if (paths.length) await supabase.storage.from('vehicle-images').remove(paths);
+      if (paths.length) await supabaseClient.storage.from('vehicle-images').remove(paths);
     }
-    const { error } = await supabase.from('vehicles').delete().eq('id', id);
+    const { error } = await supabaseClient.from('vehicles').delete().eq('id', id);
     if (error) { toast('Error: ' + error.message, true); return; }
   } else {
     DB = DB.filter(c => String(c.id) !== String(id));
@@ -473,9 +473,9 @@ async function guardarAuto() {
   if (isSupa) {
     let error;
     if (editId) {
-      ({ error } = await supabase.from('vehicles').update(payload).eq('id', editId));
+      ({ error } = await supabaseClient.from('vehicles').update(payload).eq('id', editId));
     } else {
-      ({ error } = await supabase.from('vehicles').insert([payload]));
+      ({ error } = await supabaseClient.from('vehicles').insert([payload]));
     }
     if (error) {
       toast('Error: ' + error.message, true);
@@ -731,9 +731,9 @@ async function handleFiles(files) {
         const file = imageFiles[i];
         const ext  = file.name.split('.').pop().toLowerCase().replace(/jpeg/,'jpg');
         const name = `${Date.now()}-${Math.random().toString(36).slice(2,6)}.${ext}`;
-        const { error } = await supabase.storage.from('vehicle-images').upload(name, file, { upsert: false });
+        const { error } = await supabaseClient.storage.from('vehicle-images').upload(name, file, { upsert: false });
         if (error) throw error;
-        const { data: { publicUrl } } = supabase.storage.from('vehicle-images').getPublicUrl(name);
+        const { data: { publicUrl } } = supabaseClient.storage.from('vehicle-images').getPublicUrl(name);
         imgs.push(publicUrl);
       } else {
         // Demo: usar base64
