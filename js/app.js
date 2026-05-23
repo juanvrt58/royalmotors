@@ -7,8 +7,13 @@
 // ════════════════════════════════════════
 // IMPORTANTE: Reemplaza estos valores con los tuyos (ver MANUAL.md)
 const SUPABASE_URL = 'https://saaghanbiydtvficvjsk.supabase.co';
-// ANON KEY: ve a Supabase → Project Settings → API → "anon public" — empieza con eyJ...
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhYWdoYW5iaXlkdHZmaWN2anNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0ODE4MDEsImV4cCI6MjA5NTA1NzgwMX0.YKkBYrd7Os6xV7qIbx9zi3FcqLRmIJGXOA6gP2Ff8tY';
+// ⚠️  ANON KEY incorrecta. Pasos para obtener la correcta:
+//  1. Ve a https://supabase.com → tu proyecto → ícono ⚙️ Settings (izquierda abajo)
+//  2. Clic en "API" en el menú de Settings
+//  3. Bajo "Project API keys" copia la fila "anon" "public"
+//  4. El valor correcto SIEMPRE empieza con "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+//  5. Reemplaza la línea de abajo con ese valor
+const SUPABASE_ANON_KEY = 'PEGA_AQUI_LA_ANON_KEY_QUE_EMPIEZA_CON_eyJ';
 
 // Inicializar cliente de Supabase (se carga desde CDN en cada HTML)
 const supabaseClient = window.supabase
@@ -246,8 +251,9 @@ function renderCarCard(car) {
   `;
 }
 
+
 // ════════════════════════════════════════
-// MODAL DE AUTO (con carrusel)
+// MODAL DE AUTO — carrusel transform-based
 // ════════════════════════════════════════
 function openCarModal(car) {
   const existing = document.querySelector('.modal-overlay');
@@ -257,18 +263,7 @@ function openCarModal(car) {
   overlay.className = 'modal-overlay';
 
   const images = car.images || [];
-  const carouselImgs = images.length
-    ? images.map((img, i) => `<img src="${img}" alt="${car.brand} ${car.model} ${i+1}" class="${i===0?'active':''}" loading="lazy">`).join('')
-    : `<div class="carousel-empty">Sin imagen disponible</div>`;
-
-  const carouselDots = images.length > 1
-    ? `<div class="carousel-dots">${images.map((_,i)=>`<button class="carousel-dot ${i===0?'active':''}" data-idx="${i}" aria-label="Imagen ${i+1}"></button>`).join('')}</div>`
-    : '';
-
-  const carouselArrows = images.length > 1
-    ? `<button class="carousel-btn prev" aria-label="Anterior">${ICONS.chevL}</button>
-       <button class="carousel-btn next" aria-label="Siguiente">${ICONS.chevR}</button>`
-    : '';
+  const multi  = images.length > 1;
 
   const specsHtml = car.specs
     ? Object.entries(car.specs)
@@ -283,11 +278,30 @@ function openCarModal(car) {
   overlay.innerHTML = `
     <div class="modal" role="dialog" aria-modal="true">
       <button class="modal-close" aria-label="Cerrar">${ICONS.close}</button>
+
       <div class="carousel">
-        <div class="carousel-track">${carouselImgs}</div>
-        ${carouselArrows}
-        ${carouselDots}
+        ${images.length
+          ? `<div class="carousel-track">
+               ${images.map(img => `<img src="${img}" alt="${car.brand} ${car.model}" loading="lazy">`).join('')}
+             </div>`
+          : `<div class="carousel-empty">Sin imagen disponible</div>`
+        }
+        ${multi ? `
+          <button class="carousel-btn prev" aria-label="Anterior">${ICONS.chevL}</button>
+          <button class="carousel-btn next" aria-label="Siguiente">${ICONS.chevR}</button>
+          <div class="carousel-dots">
+            ${images.map((_,i) => `<button class="carousel-dot ${i===0?'active':''}" aria-label="Imagen ${i+1}"></button>`).join('')}
+          </div>
+          <div class="carousel-counter"><span id="cCur">1</span> / ${images.length}</div>
+        ` : ''}
       </div>
+
+      ${multi ? `
+        <div class="carousel-thumbs" id="cThumbs">
+          ${images.map((img,i) => `<img class="carousel-thumb ${i===0?'active':''}" src="${img}" alt="Miniatura ${i+1}" data-idx="${i}" loading="lazy">`).join('')}
+        </div>
+      ` : ''}
+
       <div class="modal-body">
         <div class="modal-brand">${car.brand}</div>
         <div class="modal-name">${car.model} — ${car.year}</div>
@@ -298,32 +312,60 @@ function openCarModal(car) {
       </div>
     </div>
   `;
+
   document.body.appendChild(overlay);
   document.body.style.overflow = 'hidden';
 
-  // Cerrar modal
+  // ── Cerrar ──────────────────────────────
   const close = () => { overlay.remove(); document.body.style.overflow = ''; };
   overlay.querySelector('.modal-close').addEventListener('click', close);
-  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+  overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
   document.addEventListener('keydown', function esc(e) {
     if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); }
   });
 
-  // Carrusel
-  if (images.length > 1) {
-    let idx = 0;
-    const imgs = overlay.querySelectorAll('.carousel-track img');
-    const dots = overlay.querySelectorAll('.carousel-dot');
-    const setIdx = (i) => {
-      idx = (i + images.length) % images.length;
-      imgs.forEach((im, k) => im.classList.toggle('active', k === idx));
-      dots.forEach((d, k) => d.classList.toggle('active', k === idx));
-    };
-    overlay.querySelector('.carousel-btn.prev').addEventListener('click', () => setIdx(idx - 1));
-    overlay.querySelector('.carousel-btn.next').addEventListener('click', () => setIdx(idx + 1));
-    dots.forEach((d, i) => d.addEventListener('click', () => setIdx(i)));
+  // ── Carrusel ────────────────────────────
+  if (!multi || !images.length) return;
+
+  let idx = 0;
+  const track  = overlay.querySelector('.carousel-track');
+  const dots   = overlay.querySelectorAll('.carousel-dot');
+  const thumbs = overlay.querySelectorAll('.carousel-thumb');
+  const counter = overlay.querySelector('#cCur');
+
+  function goTo(i) {
+    idx = (i + images.length) % images.length;
+    track.style.transform = `translateX(-${idx * 100}%)`;
+    dots.forEach((d, k)   => d.classList.toggle('active', k === idx));
+    thumbs.forEach((t, k) => t.classList.toggle('active', k === idx));
+    if (counter) counter.textContent = idx + 1;
+    // scroll thumb into view
+    const activeThumb = overlay.querySelector('.carousel-thumb.active');
+    if (activeThumb) activeThumb.scrollIntoView({ inline: 'center', behavior: 'smooth' });
   }
+
+  overlay.querySelector('.carousel-btn.prev').addEventListener('click', () => goTo(idx - 1));
+  overlay.querySelector('.carousel-btn.next').addEventListener('click', () => goTo(idx + 1));
+  dots.forEach((d, i)   => d.addEventListener('click', () => goTo(i)));
+  thumbs.forEach((t, i) => t.addEventListener('click', () => goTo(i)));
+
+  // Swipe táctil
+  let touchStartX = 0;
+  const carouselEl = overlay.querySelector('.carousel');
+  carouselEl.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+  carouselEl.addEventListener('touchend',   e => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 40) goTo(dx < 0 ? idx + 1 : idx - 1);
+  });
+
+  // Teclado
+  document.addEventListener('keydown', function nav(e) {
+    if (!document.querySelector('.modal-overlay')) { document.removeEventListener('keydown', nav); return; }
+    if (e.key === 'ArrowRight') goTo(idx + 1);
+    if (e.key === 'ArrowLeft')  goTo(idx - 1);
+  });
 }
+
 
 // ════════════════════════════════════════
 // INICIALIZACIÓN DE PÁGINA
