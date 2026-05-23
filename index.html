@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Royal Motors — Gestión de vehículos premium en Viña del Mar y Santiago</title>
+  <meta name="description" content="Royal Motors: compra y venta inteligente de vehículos de alta gama. Consignación, financiamiento y asesoría personalizada en Viña del Mar y Santiago.">
+  <meta name="keywords" content="autos de lujo Chile, consignación vehículos, compra venta autos premium, Viña del Mar, Santiago, Porsche, BMW, Mercedes">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Royal Motors — Gestión de vehículos premium">
+  <meta property="og:description" content="La forma más inteligente de comprar tu próximo vehículo. Viña del Mar y Santiago.">
+  <meta property="og:type" content="website">
+
+  <!-- Fuentes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- Schema.org -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "AutoDealer",
+    "name": "Royal Motors",
+    "description": "Gestión inteligente de vehículos premium en Viña del Mar y Santiago",
+    "address": [
+      { "@type": "PostalAddress", "addressLocality": "Viña del Mar", "addressCountry": "CL" },
+      { "@type": "PostalAddress", "addressLocality": "Santiago", "addressCountry": "CL" }
+    ],
+    "telephone": "+56912345678"
+  }
+  </script>
+</head>
+<body>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg" style="background-image:url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1600');opacity:1"></div>
+    <div class="hero-bg" style="background-image:url('https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=1600');opacity:0"></div>
+    <div class="hero-bg" style="background-image:url('https://images.unsplash.com/photo-1555215695-3004980ad54e?w=1600');opacity:0"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-tag">Viña del Mar &amp; Santiago</div>
+      <h1 class="hero-title">La forma más <em>inteligente</em> de comprar tu próximo vehículo.</h1>
+      <p class="hero-sub">Nos especializamos en la gestión de vehículos de alta gama y selección. Servicio transparente, seguro y eficiente.</p>
+      <div class="hero-btns">
+        <a href="modelos.html" class="btn-gold">Ver Inventario</a>
+        <a href="#" id="heroWa" class="btn-outline" target="_blank" rel="noopener">Contactar</a>
+      </div>
+    </div>
+    <div class="hero-dots" id="heroDots"></div>
+  </section>
+
+  <!-- SERVICIOS -->
+  <section class="section">
+    <div class="section-tag">Servicios</div>
+    <h2 class="section-title">Gestión vehicular premium</h2>
+    <p class="section-sub">Un servicio integral diseñado para quienes valoran su tiempo y buscan excelencia.</p>
+    <div class="section-divider"></div>
+    <div class="services-grid" id="servicesGrid"></div>
+  </section>
+
+  <!-- DESTACADOS -->
+  <section class="section" style="background:var(--bg-card)">
+    <div class="section-tag">Inventario</div>
+    <h2 class="section-title">Vehículos destacados</h2>
+    <p class="section-sub">Nuestra selección más reciente de vehículos premium.</p>
+    <div class="section-divider"></div>
+    <div class="cars-grid" id="featuredCars">
+      <p style="color:var(--gray);grid-column:1/-1;text-align:center;padding:40px">Cargando vehículos...</p>
+    </div>
+    <div style="text-align:center;margin-top:40px">
+      <a href="modelos.html" class="btn-gold">Ver Todo el Inventario</a>
+    </div>
+  </section>
+
+  <!-- FUNDADOR -->
+  <section class="section">
+    <div class="owner">
+      <div class="owner-img">Foto del Fundador</div>
+      <div>
+        <div class="section-tag">Fundador</div>
+        <div class="owner-name">Nombre del Fundador</div>
+        <div class="owner-role">CEO &amp; Fundador de Royal Motors</div>
+        <div class="section-divider"></div>
+        <p class="owner-bio">
+          Con más de 10 años de experiencia en el mercado automotriz premium, nuestro fundador creó Royal Motors con una visión clara: transformar la forma en que se compran y venden vehículos de alta gama en Chile.<br><br>
+          Su compromiso con la transparencia, la calidad y el servicio personalizado ha convertido a Royal Motors en un referente de confianza para compradores y vendedores exigentes en Viña del Mar y Santiago.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- NÚMEROS -->
+  <section class="section" style="background:var(--bg-card);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+    <div style="text-align:center">
+      <div class="section-tag">Nuestra trayectoria</div>
+      <h2 class="section-title">Números que respaldan</h2>
+      <div class="section-divider" style="margin:20px auto 0"></div>
+    </div>
+    <div class="trust-grid">
+      <div><div class="trust-num">150+</div><div class="trust-label">Vehículos vendidos</div></div>
+      <div><div class="trust-num">98%</div><div class="trust-label">Clientes satisfechos</div></div>
+      <div><div class="trust-num">5+</div><div class="trust-label">Años de experiencia</div></div>
+      <div><div class="trust-num">2</div><div class="trust-label">Sedes en Chile</div></div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section" style="text-align:center;padding:80px 40px">
+    <div class="section-tag">¿Listo para dar el paso?</div>
+    <h2 class="section-title" style="max-width:600px;margin:0 auto 16px">Tu próximo vehículo te está esperando</h2>
+    <p class="section-sub" style="margin:0 auto 32px">Contáctanos hoy y descubre la experiencia Royal Motors.</p>
+    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+      <a id="ctaWa" href="#" target="_blank" rel="noopener" class="btn-gold">Contactar por WhatsApp</a>
+      <a href="contacto.html" class="btn-outline">Formulario de Contacto</a>
+    </div>
+  </section>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // Init shared
+    initPage('home');
+
+    // Links dinámicos a WhatsApp
+    document.getElementById('heroWa').href = getWhatsAppUrl();
+    document.getElementById('ctaWa').href = getWhatsAppUrl();
+
+    // Hero slider
+    (function() {
+      const bgs = document.querySelectorAll('.hero-bg');
+      const dotsEl = document.getElementById('heroDots');
+      dotsEl.innerHTML = Array.from(bgs).map((_, i) =>
+        `<button class="hero-dot ${i===0?'active':''}" data-idx="${i}" aria-label="Slide ${i+1}"></button>`
+      ).join('');
+      const dots = dotsEl.querySelectorAll('.hero-dot');
+      let cur = 0;
+      const set = (i) => {
+        cur = (i + bgs.length) % bgs.length;
+        bgs.forEach((bg, k) => bg.style.opacity = k === cur ? 1 : 0);
+        dots.forEach((d, k) => d.classList.toggle('active', k === cur));
+      };
+      dots.forEach((d, i) => d.addEventListener('click', () => set(i)));
+      setInterval(() => set(cur + 1), 5000);
+    })();
+
+    // Servicios
+    const services = [
+      { icon: ICONS.tag, name: 'Consignación Inteligente', desc: 'Nos encargamos de todo el proceso de venta. Marketing, negociación y cierre profesional.' },
+      { icon: ICONS.card, name: 'Financiamiento', desc: 'Opción de financiar hasta el 70% del valor del vehículo con las mejores tasas del mercado.' },
+      { icon: ICONS.user, name: 'Asesoría Personalizada', desc: 'Atención uno a uno en Viña del Mar y Santiago. Te guiamos en cada paso.' },
+      { icon: ICONS.search, name: 'Compra a Pedido', desc: '¿No encuentras lo que buscas? Lo buscamos. Acceso a una red exclusiva de vehículos.' }
+    ];
+    document.getElementById('servicesGrid').innerHTML = services.map(s => `
+      <div class="service-card">
+        <div class="service-icon">${s.icon}</div>
+        <div class="service-name">${s.name}</div>
+        <div class="service-desc">${s.desc}</div>
+      </div>
+    `).join('');
+
+    // Autos destacados
+    (async () => {
+      const cars = await loadCars();
+      const featured = cars.filter(c => c.featured && c.status !== 'sold');
+      const toShow = (featured.length ? featured : cars.filter(c => c.status !== 'sold')).slice(0, 6);
+      const grid = document.getElementById('featuredCars');
+      if (!toShow.length) {
+        grid.innerHTML = '<p style="color:var(--gray);grid-column:1/-1;text-align:center;padding:40px">No hay vehículos disponibles en este momento.</p>';
+        return;
+      }
+      grid.innerHTML = toShow.map(renderCarCard).join('');
+      grid.querySelectorAll('.car-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const id = card.dataset.carId;
+          const car = toShow.find(c => String(c.id) === String(id));
+          if (car) openCarModal(car);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

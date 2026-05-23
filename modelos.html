@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nuestros Modelos — Royal Motors</title>
+  <meta name="description" content="Explora nuestro inventario de vehículos premium. Filtra por marca, tipo y precio.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <section class="page-hero">
+    <div>
+      <div class="section-tag">Catálogo</div>
+      <h1 class="page-hero-title">Nuestros Modelos</h1>
+      <p class="page-hero-sub">Explora nuestra selección de vehículos premium. Filtra por marca, tipo y precio.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="filters">
+      <select class="filter-select" id="filterBrand"><option value="">Todas las marcas</option></select>
+      <select class="filter-select" id="filterType"><option value="">Todos los tipos</option></select>
+      <select class="filter-select" id="filterCategory">
+        <option value="">Todas las categorías</option>
+        <option value="alto_valor">Alto Valor</option>
+        <option value="valor_medio">Valor Medio</option>
+      </select>
+      <select class="filter-select" id="filterPrice">
+        <option value="">Cualquier precio</option>
+        <option value="0-30">Hasta $30M</option>
+        <option value="30-50">$30M — $50M</option>
+        <option value="50-80">$50M — $80M</option>
+        <option value="80+">Más de $80M</option>
+      </select>
+      <select class="filter-select" id="filterSort">
+        <option value="">Ordenar por</option>
+        <option value="price_asc">Precio: Menor a Mayor</option>
+        <option value="price_desc">Precio: Mayor a Menor</option>
+        <option value="year_desc">Más reciente</option>
+      </select>
+      <button class="filter-clear" id="clearFilters">Limpiar filtros</button>
+    </div>
+    <p id="resultCount" style="color:var(--gray);font-size:14px;margin-bottom:24px">Cargando...</p>
+    <div class="cars-grid" id="carsGrid"></div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/app.js"></script>
+  <script>
+    initPage('modelos');
+
+    let allCars = [];
+
+    const fBrand = document.getElementById('filterBrand');
+    const fType = document.getElementById('filterType');
+    const fCat = document.getElementById('filterCategory');
+    const fPrice = document.getElementById('filterPrice');
+    const fSort = document.getElementById('filterSort');
+    const clearBtn = document.getElementById('clearFilters');
+    const grid = document.getElementById('carsGrid');
+    const countEl = document.getElementById('resultCount');
+
+    function applyFilters() {
+      let list = allCars.slice();
+      const b = fBrand.value, t = fType.value, c = fCat.value, p = fPrice.value, s = fSort.value;
+      if (b) list = list.filter(x => x.brand === b);
+      if (t) list = list.filter(x => x.type === t);
+      if (c) list = list.filter(x => x.category === c);
+      if (p === '0-30') list = list.filter(x => x.price <= 30000000);
+      if (p === '30-50') list = list.filter(x => x.price >= 30000000 && x.price <= 50000000);
+      if (p === '50-80') list = list.filter(x => x.price >= 50000000 && x.price <= 80000000);
+      if (p === '80+') list = list.filter(x => x.price >= 80000000);
+      if (s === 'price_asc') list.sort((a, b) => a.price - b.price);
+      if (s === 'price_desc') list.sort((a, b) => b.price - a.price);
+      if (s === 'year_desc') list.sort((a, b) => b.year - a.year);
+      render(list);
+    }
+
+    function render(list) {
+      countEl.textContent = `${list.length} vehículo${list.length !== 1 ? 's' : ''} encontrado${list.length !== 1 ? 's' : ''}`;
+      if (!list.length) {
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:80px;color:var(--gray)"><p style="font-size:18px;margin-bottom:8px">No se encontraron vehículos</p><p style="font-size:14px">Prueba ajustando los filtros.</p></div>';
+        return;
+      }
+      grid.innerHTML = list.map(renderCarCard).join('');
+      grid.querySelectorAll('.car-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const id = card.dataset.carId;
+          const car = list.find(c => String(c.id) === String(id));
+          if (car) openCarModal(car);
+        });
+      });
+    }
+
+    [fBrand, fType, fCat, fPrice, fSort].forEach(el => el.addEventListener('change', applyFilters));
+    clearBtn.addEventListener('click', () => {
+      [fBrand, fType, fCat, fPrice, fSort].forEach(el => el.value = '');
+      applyFilters();
+    });
+
+    (async () => {
+      allCars = await loadCars();
+      // Llenar selects
+      const brands = [...new Set(allCars.map(c => c.brand))].sort();
+      fBrand.innerHTML = '<option value="">Todas las marcas</option>' + brands.map(b => `<option value="${b}">${b}</option>`).join('');
+      fType.innerHTML = '<option value="">Todos los tipos</option>' + TYPES.map(t => `<option value="${t}">${t}</option>`).join('');
+      applyFilters();
+    })();
+  </script>
+</body>
+</html>

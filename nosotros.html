@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sobre Nosotros — Royal Motors</title>
+  <meta name="description" content="Conoce la filosofía y las personas detrás de Royal Motors.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <section class="page-hero">
+    <div>
+      <div class="section-tag">Nuestra Historia</div>
+      <h1 class="page-hero-title">Sobre Nosotros</h1>
+      <p class="page-hero-sub">Conoce la filosofía y las personas detrás de Royal Motors.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="about-grid">
+      <div>
+        <div class="section-tag">¿Quiénes somos?</div>
+        <h2 class="section-title">Gestión inteligente de vehículos</h2>
+        <div class="section-divider"></div>
+        <p class="about-text">
+          En Royal Motors nos especializamos en la gestión de vehículos de alta gama y selección, conectando a vendedores y compradores a través de un servicio transparente, seguro y eficiente en Viña del Mar y Santiago.
+          <br><br>
+          No somos solo una automotora. Somos asesores que entienden que un vehículo es más que un medio de transporte — es una extensión de tu estilo de vida. Cada auto que manejamos pasa por un riguroso proceso de selección para garantizar la calidad que nuestros clientes merecen.
+          <br><br>
+          Nuestra misión es simple: hacer que comprar o vender un vehículo premium sea una experiencia tan placentera como conducirlo.
+        </p>
+      </div>
+      <div class="about-img">Imagen de la empresa</div>
+    </div>
+  </section>
+
+  <section class="section" style="background:var(--bg-card);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+    <div style="text-align:center;margin-bottom:50px">
+      <div class="section-tag">Principios</div>
+      <h2 class="section-title">Nuestros valores</h2>
+      <div class="section-divider" style="margin:20px auto 0"></div>
+    </div>
+    <div class="values-grid" id="valuesGrid"></div>
+  </section>
+
+  <section class="section">
+    <div class="owner">
+      <div class="owner-img">Foto del Fundador</div>
+      <div>
+        <div class="section-tag">El Fundador</div>
+        <div class="owner-name">Nombre del Fundador</div>
+        <div class="owner-role">CEO &amp; Fundador</div>
+        <div class="section-divider"></div>
+        <p class="owner-bio">
+          Apasionado por los autos desde joven, fundó Royal Motors con la convicción de que el mercado automotriz premium en Chile necesitaba un estándar más alto de servicio. Su visión: combinar la pasión por los vehículos con una gestión empresarial impecable.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/app.js"></script>
+  <script>
+    initPage('nosotros');
+    const values = [
+      { icon: ICONS.shield, title: 'Transparencia', desc: 'Cada detalle del vehículo y del proceso es comunicado con total claridad. Sin sorpresas.' },
+      { icon: ICONS.star, title: 'Excelencia', desc: 'Solo trabajamos con vehículos que cumplen nuestros estándares de calidad y presentación.' },
+      { icon: ICONS.handshake, title: 'Confianza', desc: 'Relaciones a largo plazo basadas en resultados. Nuestros clientes vuelven y nos recomiendan.' }
+    ];
+    document.getElementById('valuesGrid').innerHTML = values.map(v => `
+      <div class="value-card">
+        <div class="value-icon">${v.icon}</div>
+        <div class="value-title">${v.title}</div>
+        <div class="value-desc">${v.desc}</div>
+      </div>
+    `).join('');
+  </script>
+</body>
+</html>

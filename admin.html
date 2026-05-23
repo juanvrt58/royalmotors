@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Administración — Royal Motors</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════
+       VISTA 1: LOGIN
+       ═══════════════════════════════════════ -->
+  <div id="loginView" class="admin-login" style="display:none">
+    <div class="login-box">
+      <div class="login-title">ROYAL MOTORS</div>
+      <div class="login-sub" id="loginSub">Panel de Administración</div>
+
+      <div id="loginError" class="login-error" style="display:none"></div>
+      <div id="loginSuccess" class="login-success" style="display:none"></div>
+
+      <!-- Formulario de login -->
+      <div id="loginForm">
+        <div class="form-group">
+          <label class="form-label" for="loginEmail">Correo electrónico</label>
+          <input class="form-input" type="email" id="loginEmail" placeholder="admin@royalmotors.cl">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="loginPass">Contraseña</label>
+          <input class="form-input" type="password" id="loginPass" placeholder="Contraseña">
+        </div>
+        <button class="btn-gold" id="btnLogin" style="width:100%;margin-bottom:12px">Ingresar</button>
+        <div style="display:flex;justify-content:space-between;font-size:13px">
+          <button class="nav-link" id="btnShowReset">¿Olvidaste tu contraseña?</button>
+          <a href="index.html" class="nav-link">Volver al sitio</a>
+        </div>
+      </div>
+
+      <!-- Formulario de reset -->
+      <div id="resetForm" style="display:none">
+        <div class="form-group">
+          <label class="form-label" for="resetEmail">Correo electrónico</label>
+          <input class="form-input" type="email" id="resetEmail" placeholder="admin@royalmotors.cl">
+        </div>
+        <button class="btn-gold" id="btnReset" style="width:100%;margin-bottom:12px">Enviar enlace de restablecimiento</button>
+        <button class="nav-link" id="btnBackToLogin" style="width:100%;text-align:center">Volver al login</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       VISTA 2: DASHBOARD
+       ═══════════════════════════════════════ -->
+  <div id="dashboardView" class="dashboard" style="display:none">
+    <aside class="dash-side">
+      <a href="index.html" class="dash-side-logo">ROYAL MOTORS</a>
+      <button class="dash-menu-item active" id="menuCars" data-tab="cars"></button>
+      <button class="dash-menu-item" id="menuAdd"></button>
+      <button class="dash-menu-item" id="menuPassword" data-tab="password"></button>
+      <div style="flex:1"></div>
+      <a href="index.html" class="dash-menu-item"></a>
+      <button class="dash-menu-item" id="btnLogout"></button>
+    </aside>
+
+    <main class="dash-main">
+      <!-- ── TAB: VEHÍCULOS ── -->
+      <div id="tabCars">
+        <div class="dash-stats" id="statsGrid"></div>
+        <div class="dash-header">
+          <h1 class="dash-title">Gestión de Vehículos</h1>
+          <button class="btn-gold" id="btnNewCar"></button>
+        </div>
+        <div id="formContainer"></div>
+        <div style="overflow-x:auto">
+          <table class="data-table" id="carsTable">
+            <thead>
+              <tr>
+                <th style="width:50px"></th>
+                <th>Vehículo</th>
+                <th>Año</th>
+                <th>Precio</th>
+                <th>Categoría</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="carsTableBody"></tbody>
+          </table>
+          <div id="emptyCars" style="display:none;text-align:center;padding:60px;color:var(--gray)">
+            <p style="font-size:16px;margin-bottom:8px">No hay vehículos en el inventario</p>
+            <p style="font-size:14px">Comienza agregando tu primer vehículo.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TAB: CAMBIAR CONTRASEÑA ── -->
+      <div id="tabPassword" style="display:none">
+        <div class="dash-header"><h1 class="dash-title">Cambiar Contraseña</h1></div>
+        <div class="admin-form" style="max-width:480px">
+          <div id="passMsg" style="display:none"></div>
+          <div class="form-group">
+            <label class="form-label">Nueva contraseña</label>
+            <input class="form-input" type="password" id="newPass">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirmar contraseña</label>
+            <input class="form-input" type="password" id="confirmPass">
+          </div>
+          <button class="btn-gold" id="btnChangePass">Guardar Contraseña</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       SCRIPTS
+       ═══════════════════════════════════════ -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // Preparar íconos de menú
+    document.getElementById('menuCars').innerHTML = ICONS.car + ' Vehículos';
+    document.getElementById('menuAdd').innerHTML = ICONS.plus + ' Agregar Vehículo';
+    document.getElementById('menuPassword').innerHTML = ICONS.lock + ' Cambiar Contraseña';
+    document.querySelectorAll('a.dash-menu-item')[0].innerHTML = ICONS.globe + ' Ver Sitio Web';
+    document.getElementById('btnLogout').innerHTML = ICONS.logout + ' Cerrar Sesión';
+    document.getElementById('btnNewCar').innerHTML = ICONS.plus + ' Agregar Vehículo';
+
+    // ════════════════════════════════════════
+    // ESTADO GLOBAL
+    // ════════════════════════════════════════
+    let currentCars = [];
+    let editingCarId = null;
+
+    const emptyForm = {
+      brand: '', model: '', year: 2024, price: '',
+      category: 'alto_valor', type: 'SUV',
+      images: [], description: '',
+      whatsapp: RM_CONFIG.whatsappNumber,
+      featured: false, status: 'available',
+      specs: { motor: '', hp: '', transmision: '', combustible: '', km: '', color: '', traccion: '' }
+    };
+
+    // ════════════════════════════════════════
+    // AUTENTICACIÓN — Supabase
+    // ════════════════════════════════════════
+    async function checkAuth() {
+      if (!supabase || SUPABASE_URL === 'https://TU-PROYECTO.supabase.co') {
+        showLogin('Supabase no configurado. Edita js/app.js con tus credenciales.');
+        return;
+      }
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        showDashboard();
+      } else {
+        showLogin();
+      }
+    }
+
+    function showLogin(warning) {
+      document.getElementById('loginView').style.display = 'flex';
+      document.getElementById('dashboardView').style.display = 'none';
+      if (warning) {
+        const err = document.getElementById('loginError');
+        err.textContent = warning;
+        err.style.display = 'block';
+      }
+    }
+
+    function showDashboard() {
+      document.getElementById('loginView').style.display = 'none';
+      document.getElementById('dashboardView').style.display = 'flex';
+      loadDashboardData();
+    }
+
+    async function doLogin() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const pass = document.getElementById('loginPass').value;
+      const errEl = document.getElementById('loginError');
+      errEl.style.display = 'none';
+
+      if (!supabase || SUPABASE_URL === 'https://TU-PROYECTO.supabase.co') {
+        errEl.textContent = 'Supabase no configurado. Revisa el manual.';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
+      if (error) {
+        errEl.textContent = 'Credenciales incorrectas.';
+        errEl.style.display = 'block';
+      } else {
+        showDashboard();
+      }
+    }
+
+    async function doLogout() {
+      if (supabase) await supabase.auth.signOut();
+      location.reload();
+    }
+
+    async function doReset() {
+      const email = document.getElementById('resetEmail').value.trim();
+      const errEl = document.getElementById('loginError');
+      const okEl = document.getElementById('loginSuccess');
+      errEl.style.display = 'none';
+      okEl.style.display = 'none';
+
+      if (!email) {
+        errEl.textContent = 'Ingresa tu correo electrónico.';
+        errEl.style.display = 'block';
+        return;
+      }
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + window.location.pathname
+      });
+      if (error) {
+        errEl.textContent = error.message;
+        errEl.style.display = 'block';
+      } else {
+        okEl.textContent = 'Se ha enviado un correo con instrucciones.';
+        okEl.style.display = 'block';
+      }
+    }
+
+    async function changePassword() {
+      const newP = document.getElementById('newPass').value;
+      const confP = document.getElementById('confirmPass').value;
+      const msg = document.getElementById('passMsg');
+      msg.style.display = 'block';
+      if (newP !== confP) { msg.className = 'login-error'; msg.textContent = 'Las contraseñas no coinciden.'; return; }
+      if (newP.length < 6) { msg.className = 'login-error'; msg.textContent = 'Mínimo 6 caracteres.'; return; }
+      const { error } = await supabase.auth.updateUser({ password: newP });
+      if (error) {
+        msg.className = 'login-error'; msg.textContent = error.message;
+      } else {
+        msg.className = 'login-success'; msg.textContent = 'Contraseña actualizada exitosamente.';
+        document.getElementById('newPass').value = '';
+        document.getElementById('confirmPass').value = '';
+      }
+    }
+
+    // ════════════════════════════════════════
+    // CRUD DE VEHÍCULOS — Supabase
+    // ════════════════════════════════════════
+    async function loadDashboardData() {
+      const { data, error } = await supabase
+        .from('vehicles')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) {
+        showToast('Error cargando vehículos: ' + error.message);
+        currentCars = [];
+      } else {
+        currentCars = (data || []).map(v => ({
+          ...v, images: v.images || [], specs: v.specs || {}
+        }));
+      }
+      renderStats();
+      renderCarsTable();
+    }
+
+    function renderStats() {
+      const total = currentCars.length;
+      const avail = currentCars.filter(c => c.status === 'available').length;
+      const sold = currentCars.filter(c => c.status === 'sold').length;
+      const feat = currentCars.filter(c => c.featured).length;
+      document.getElementById('statsGrid').innerHTML = `
+        <div class="dash-stat"><div class="dash-stat-num">${total}</div><div class="dash-stat-label">Total Vehículos</div></div>
+        <div class="dash-stat"><div class="dash-stat-num">${avail}</div><div class="dash-stat-label">Disponibles</div></div>
+        <div class="dash-stat"><div class="dash-stat-num">${sold}</div><div class="dash-stat-label">Vendidos</div></div>
+        <div class="dash-stat"><div class="dash-stat-num">${feat}</div><div class="dash-stat-label">Destacados</div></div>
+      `;
+    }
+
+    function renderCarsTable() {
+      const tbody = document.getElementById('carsTableBody');
+      const empty = document.getElementById('emptyCars');
+      if (!currentCars.length) {
+        tbody.innerHTML = '';
+        empty.style.display = 'block';
+        document.getElementById('carsTable').style.display = 'none';
+        return;
+      }
+      empty.style.display = 'none';
+      document.getElementById('carsTable').style.display = '';
+      tbody.innerHTML = currentCars.map(car => `
+        <tr>
+          <td>${car.images?.[0] ? `<img class="table-img" src="${car.images[0]}" alt="">` : `<div class="table-img" style="background:var(--bg-card-2)"></div>`}</td>
+          <td><strong style="color:var(--white)">${car.brand}</strong> <span style="color:var(--gray)">${car.model}</span></td>
+          <td>${car.year}</td>
+          <td style="color:var(--gold);font-weight:600">${fmtPrice(car.price)}</td>
+          <td style="font-size:12px">${car.category === 'alto_valor' ? 'Alto Valor' : 'Valor Medio'}</td>
+          <td><span class="status"><span class="status-dot ${car.status}"></span>${car.status === 'available' ? 'Disponible' : 'Vendido'}</span></td>
+          <td>
+            <div class="table-actions">
+              <button class="table-btn" data-action="edit" data-id="${car.id}">${ICONS.edit} Editar</button>
+              <button class="table-btn" data-action="toggle" data-id="${car.id}">${car.status === 'available' ? 'Marcar Vendido' : 'Marcar Disponible'}</button>
+              <button class="table-btn delete" data-action="delete" data-id="${car.id}">${ICONS.trash}</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      tbody.querySelectorAll('button[data-action]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.dataset.id;
+          const action = btn.dataset.action;
+          const car = currentCars.find(c => String(c.id) === String(id));
+          if (!car) return;
+          if (action === 'edit') openForm(car);
+          if (action === 'toggle') toggleStatus(car);
+          if (action === 'delete') deleteCar(car);
+        });
+      });
+    }
+
+    async function toggleStatus(car) {
+      const newStatus = car.status === 'available' ? 'sold' : 'available';
+      const { error } = await supabase.from('vehicles').update({ status: newStatus }).eq('id', car.id);
+      if (error) { showToast('Error: ' + error.message); return; }
+      showToast(newStatus === 'sold' ? 'Marcado como vendido' : 'Marcado como disponible');
+      loadDashboardData();
+    }
+
+    async function deleteCar(car) {
+      if (!confirm(`¿Eliminar ${car.brand} ${car.model}? Esta acción no se puede deshacer.`)) return;
+      // Si tiene imágenes en Supabase Storage, borrarlas también
+      const storageImages = (car.images || []).filter(url => url.includes('/storage/v1/object/public/'));
+      if (storageImages.length) {
+        const paths = storageImages.map(url => {
+          const m = url.match(/vehicle-images\/(.+)$/);
+          return m ? m[1] : null;
+        }).filter(Boolean);
+        if (paths.length) await supabase.storage.from('vehicle-images').remove(paths);
+      }
+      const { error } = await supabase.from('vehicles').delete().eq('id', car.id);
+      if (error) { showToast('Error: ' + error.message); return; }
+      showToast('Vehículo eliminado');
+      loadDashboardData();
+    }
+
+    async function saveCar(formData) {
+      if (!formData.brand || !formData.model || !formData.price) {
+        showToast('Completa marca, modelo y precio');
+        return false;
+      }
+      const payload = {
+        brand: formData.brand,
+        model: formData.model,
+        year: parseInt(formData.year) || 2024,
+        price: parseInt(formData.price) || 0,
+        category: formData.category,
+        type: formData.type,
+        images: formData.images,
+        description: formData.description,
+        whatsapp: formData.whatsapp,
+        featured: formData.featured,
+        status: formData.status,
+        specs: formData.specs
+      };
+      let error;
+      if (editingCarId) {
+        ({ error } = await supabase.from('vehicles').update(payload).eq('id', editingCarId));
+      } else {
+        ({ error } = await supabase.from('vehicles').insert([payload]));
+      }
+      if (error) { showToast('Error: ' + error.message); return false; }
+      showToast(editingCarId ? 'Vehículo actualizado' : 'Vehículo agregado');
+      return true;
+    }
+
+    // ════════════════════════════════════════
+    // SUBIR IMÁGENES A SUPABASE STORAGE
+    // ════════════════════════════════════════
+    async function uploadImage(file) {
+      const ext = file.name.split('.').pop().toLowerCase();
+      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2,7)}.${ext}`;
+      const { error } = await supabase.storage
+        .from('vehicle-images')
+        .upload(fileName, file, { cacheControl: '3600', upsert: false });
+      if (error) throw error;
+      const { data: { publicUrl } } = supabase.storage.from('vehicle-images').getPublicUrl(fileName);
+      return publicUrl;
+    }
+
+    // ════════════════════════════════════════
+    // FORMULARIO DE AGREGAR/EDITAR
+    // ════════════════════════════════════════
+    function openForm(car) {
+      editingCarId = car ? car.id : null;
+      const data = car
+        ? { ...emptyForm, ...car, images: [...(car.images || [])], specs: { ...emptyForm.specs, ...(car.specs || {}) } }
+        : { ...emptyForm, images: [], specs: { ...emptyForm.specs } };
+
+      const container = document.getElementById('formContainer');
+      container.innerHTML = `
+        <div class="admin-form">
+          <h3 style="font-family:var(--font-display);font-size:20px;margin-bottom:24px">
+            ${editingCarId ? 'Editar Vehículo' : 'Nuevo Vehículo'}
+          </h3>
+          <div class="admin-form-grid">
+            <div><label class="form-label">Marca *</label>
+              <select class="form-select" id="fBrand">
+                <option value="">Seleccionar...</option>
+                ${BRANDS.map(b => `<option value="${b}" ${data.brand === b ? 'selected' : ''}>${b}</option>`).join('')}
+              </select>
+            </div>
+            <div><label class="form-label">Modelo *</label>
+              <input class="form-input" id="fModel" value="${data.model}" placeholder="Ej: Cayenne S">
+            </div>
+            <div><label class="form-label">Año</label>
+              <input class="form-input" type="number" id="fYear" value="${data.year}">
+            </div>
+            <div><label class="form-label">Precio (CLP) *</label>
+              <input class="form-input" type="number" id="fPrice" value="${data.price}" placeholder="45000000">
+            </div>
+            <div><label class="form-label">Categoría</label>
+              <select class="form-select" id="fCategory">
+                ${CATEGORIES.map(c => `<option value="${c.v}" ${data.category === c.v ? 'selected' : ''}>${c.l}</option>`).join('')}
+              </select>
+            </div>
+            <div><label class="form-label">Tipo</label>
+              <select class="form-select" id="fType">
+                ${TYPES.map(t => `<option value="${t}" ${data.type === t ? 'selected' : ''}>${t}</option>`).join('')}
+              </select>
+            </div>
+            <div><label class="form-label">Estado</label>
+              <select class="form-select" id="fStatus">
+                <option value="available" ${data.status === 'available' ? 'selected' : ''}>Disponible</option>
+                <option value="sold" ${data.status === 'sold' ? 'selected' : ''}>Vendido</option>
+              </select>
+            </div>
+            <div><label class="form-label">WhatsApp</label>
+              <input class="form-input" id="fWhatsapp" value="${data.whatsapp}" placeholder="56912345678">
+            </div>
+            <div class="admin-form-full">
+              <label class="form-label">Descripción</label>
+              <textarea class="form-textarea" id="fDesc" style="height:80px">${data.description || ''}</textarea>
+            </div>
+            <div class="admin-form-full" id="imgManagerWrap"></div>
+            <div class="admin-form-full">
+              <label class="form-label" style="margin-bottom:12px">Especificaciones Técnicas</label>
+              <div class="admin-form-grid">
+                ${[
+                  ['motor','Motor'],['hp','Potencia (HP)'],['transmision','Transmisión'],
+                  ['combustible','Combustible'],['km','Kilometraje'],['color','Color'],
+                  ['traccion','Tracción']
+                ].map(([k,l]) => `
+                  <div>
+                    <label class="form-label" style="font-size:11px">${l}</label>
+                    <input class="form-input" data-spec="${k}" value="${data.specs[k] || ''}">
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+            <div class="admin-form-full">
+              <label style="display:flex;align-items:center;gap:8px;color:var(--gray);font-size:14px;cursor:pointer">
+                <input type="checkbox" id="fFeatured" ${data.featured ? 'checked' : ''}>
+                Marcar como destacado — aparecerá en la página de inicio
+              </label>
+            </div>
+          </div>
+          <div class="admin-form-actions">
+            <button class="btn-outline" id="btnCancel" style="padding:10px 24px">Cancelar</button>
+            <button class="btn-gold" id="btnSave" style="padding:10px 24px">
+              ${editingCarId ? 'Guardar Cambios' : 'Agregar Vehículo'}
+            </button>
+          </div>
+        </div>
+      `;
+
+      // Render del gestor de imágenes
+      renderImageManager(data.images);
+
+      // Eventos
+      document.getElementById('btnCancel').addEventListener('click', closeForm);
+      document.getElementById('btnSave').addEventListener('click', async () => {
+        const images = window._currentImages || [];
+        const specs = {};
+        container.querySelectorAll('[data-spec]').forEach(el => { specs[el.dataset.spec] = el.value.trim(); });
+        const formData = {
+          brand: document.getElementById('fBrand').value,
+          model: document.getElementById('fModel').value.trim(),
+          year: document.getElementById('fYear').value,
+          price: document.getElementById('fPrice').value,
+          category: document.getElementById('fCategory').value,
+          type: document.getElementById('fType').value,
+          status: document.getElementById('fStatus').value,
+          whatsapp: document.getElementById('fWhatsapp').value.trim(),
+          description: document.getElementById('fDesc').value.trim(),
+          featured: document.getElementById('fFeatured').checked,
+          images, specs
+        };
+        document.getElementById('btnSave').disabled = true;
+        document.getElementById('btnSave').textContent = 'Guardando...';
+        const ok = await saveCar(formData);
+        if (ok) {
+          closeForm();
+          loadDashboardData();
+        } else {
+          document.getElementById('btnSave').disabled = false;
+          document.getElementById('btnSave').textContent = editingCarId ? 'Guardar Cambios' : 'Agregar Vehículo';
+        }
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function closeForm() {
+      editingCarId = null;
+      document.getElementById('formContainer').innerHTML = '';
+      window._currentImages = [];
+    }
+
+    // ════════════════════════════════════════
+    // GESTOR DE IMÁGENES
+    // ════════════════════════════════════════
+    function renderImageManager(initialImages) {
+      window._currentImages = [...(initialImages || [])];
+      const wrap = document.getElementById('imgManagerWrap');
+      const redraw = () => {
+        const imgs = window._currentImages;
+        wrap.innerHTML = `
+          <div class="img-manager">
+            <div class="img-manager-title">Gestión de Imágenes (${imgs.length})</div>
+            <div class="img-url-input">
+              <input class="form-input" id="imgUrlInput" placeholder="Pegar URL de imagen...">
+              <button class="img-url-add" id="btnAddUrl">Agregar URL</button>
+            </div>
+            <div class="img-dropzone" id="dropzone">
+              <div class="img-dropzone-icon">${ICONS.upload}</div>
+              <div class="img-dropzone-text">Arrastra imágenes aquí o haz clic para seleccionar</div>
+              <div class="img-dropzone-sub">JPG, PNG, WebP — se suben a Supabase Storage</div>
+              <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
+            </div>
+            <div id="uploadStatus" style="display:none;color:var(--gold);font-size:13px;margin-bottom:12px;text-align:center"></div>
+            ${imgs.length ? `
+              <div class="img-list">
+                ${imgs.map((img, i) => `
+                  <div class="img-item">
+                    <img src="${img}" alt="Imagen ${i+1}" onerror="this.style.display='none'">
+                    ${i === 0 ? '<div class="img-item-primary">Principal</div>' : ''}
+                    <div class="img-item-actions">
+                      <button class="img-item-btn del" data-del="${i}" title="Eliminar">${ICONS.trash}</button>
+                    </div>
+                    ${imgs.length > 1 ? `
+                      <div class="img-item-order">
+                        <button data-move="up" data-idx="${i}" ${i === 0 ? 'disabled' : ''}>${ICONS.arrowUp}</button>
+                        <button data-move="down" data-idx="${i}" ${i === imgs.length - 1 ? 'disabled' : ''}>${ICONS.arrowDown}</button>
+                      </div>
+                    ` : ''}
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+          </div>
+        `;
+
+        // Eventos
+        document.getElementById('btnAddUrl').addEventListener('click', () => {
+          const v = document.getElementById('imgUrlInput').value.trim();
+          if (v) { window._currentImages.push(v); document.getElementById('imgUrlInput').value = ''; redraw(); }
+        });
+        document.getElementById('imgUrlInput').addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') { e.preventDefault(); document.getElementById('btnAddUrl').click(); }
+        });
+
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        dropzone.addEventListener('click', () => fileInput.click());
+        dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+        dropzone.addEventListener('drop', (e) => {
+          e.preventDefault(); dropzone.classList.remove('dragover');
+          handleFiles(e.dataTransfer.files);
+        });
+        fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+
+        async function handleFiles(files) {
+          const status = document.getElementById('uploadStatus');
+          const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+          if (!imageFiles.length) return;
+          status.style.display = 'block';
+          status.textContent = `Subiendo ${imageFiles.length} imagen${imageFiles.length>1?'es':''}...`;
+          for (let i = 0; i < imageFiles.length; i++) {
+            try {
+              status.textContent = `Subiendo ${i+1}/${imageFiles.length}...`;
+              const url = await uploadImage(imageFiles[i]);
+              window._currentImages.push(url);
+            } catch (err) {
+              showToast('Error subiendo imagen: ' + err.message);
+            }
+          }
+          status.style.display = 'none';
+          redraw();
+        }
+
+        wrap.querySelectorAll('[data-del]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const i = parseInt(btn.dataset.del);
+            window._currentImages.splice(i, 1);
+            redraw();
+          });
+        });
+        wrap.querySelectorAll('[data-move]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const i = parseInt(btn.dataset.idx);
+            const dir = btn.dataset.move === 'up' ? -1 : 1;
+            const n = i + dir;
+            if (n < 0 || n >= window._currentImages.length) return;
+            const arr = window._currentImages;
+            [arr[i], arr[n]] = [arr[n], arr[i]];
+            redraw();
+          });
+        });
+      };
+      redraw();
+    }
+
+    // ════════════════════════════════════════
+    // NAVEGACIÓN DE TABS
+    // ════════════════════════════════════════
+    function showTab(tab) {
+      document.getElementById('tabCars').style.display = tab === 'cars' ? 'block' : 'none';
+      document.getElementById('tabPassword').style.display = tab === 'password' ? 'block' : 'none';
+      document.querySelectorAll('.dash-menu-item[data-tab]').forEach(b => b.classList.remove('active'));
+      const menuBtn = document.querySelector(`.dash-menu-item[data-tab="${tab}"]`);
+      if (menuBtn) menuBtn.classList.add('active');
+    }
+
+    // ════════════════════════════════════════
+    // EVENT LISTENERS
+    // ════════════════════════════════════════
+    document.getElementById('btnLogin').addEventListener('click', doLogin);
+    document.getElementById('loginPass').addEventListener('keydown', (e) => { if (e.key === 'Enter') doLogin(); });
+    document.getElementById('btnShowReset').addEventListener('click', () => {
+      document.getElementById('loginForm').style.display = 'none';
+      document.getElementById('resetForm').style.display = 'block';
+      document.getElementById('loginSub').textContent = 'Restablecer contraseña';
+      document.getElementById('loginError').style.display = 'none';
+    });
+    document.getElementById('btnBackToLogin').addEventListener('click', () => {
+      document.getElementById('loginForm').style.display = 'block';
+      document.getElementById('resetForm').style.display = 'none';
+      document.getElementById('loginSub').textContent = 'Panel de Administración';
+      document.getElementById('loginError').style.display = 'none';
+      document.getElementById('loginSuccess').style.display = 'none';
+    });
+    document.getElementById('btnReset').addEventListener('click', doReset);
+    document.getElementById('btnLogout').addEventListener('click', doLogout);
+    document.getElementById('btnNewCar').addEventListener('click', () => openForm(null));
+    document.getElementById('menuCars').addEventListener('click', () => { showTab('cars'); closeForm(); });
+    document.getElementById('menuAdd').addEventListener('click', () => { showTab('cars'); openForm(null); });
+    document.getElementById('menuPassword').addEventListener('click', () => { showTab('password'); closeForm(); });
+    document.getElementById('btnChangePass').addEventListener('click', changePassword);
+
+    // ════════════════════════════════════════
+    // INICIAR
+    // ════════════════════════════════════════
+    checkAuth();
+  </script>
+</body>
+</html>

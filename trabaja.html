@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trabaja con Nosotros — Royal Motors</title>
+  <meta name="description" content="Únete al equipo de Royal Motors. Oportunidades laborales en el sector automotriz premium.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <section class="page-hero">
+    <div>
+      <div class="section-tag">Carreras</div>
+      <h1 class="page-hero-title">Trabaja con Nosotros</h1>
+      <p class="page-hero-sub">¿Te apasionan los autos y la excelencia? Únete a nuestro equipo.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div style="max-width:700px">
+      <h2 class="section-title">Oportunidades abiertas</h2>
+      <p class="section-sub">Buscamos personas comprometidas, con pasión por el servicio premium y el mundo automotriz.</p>
+      <div class="section-divider"></div>
+    </div>
+    <div class="jobs-grid" id="jobsGrid"></div>
+
+    <div style="margin-top:60px;padding:40px;background:var(--bg-card);border:1px solid var(--border);text-align:center">
+      <h3 style="font-family:var(--font-display);font-size:22px;margin-bottom:8px">¿No ves tu perfil?</h3>
+      <p style="color:var(--gray);font-size:14px;margin-bottom:20px">Envíanos tu CV de todas formas. Siempre estamos buscando talento.</p>
+      <a id="cvBtn" href="#" class="btn-outline">Enviar CV</a>
+    </div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/app.js"></script>
+  <script>
+    initPage('trabaja');
+
+    const jobs = [
+      { title: 'Asesor Comercial', location: 'Viña del Mar', desc: 'Atención personalizada a clientes interesados en compra o venta de vehículos premium. Experiencia en ventas y atención al cliente.' },
+      { title: 'Ejecutivo de Consignación', location: 'Santiago', desc: 'Gestión integral del proceso de consignación. Desde la evaluación del vehículo hasta el cierre de la venta.' },
+      { title: 'Community Manager', location: 'Remoto', desc: 'Creación de contenido y gestión de redes sociales para posicionar a Royal Motors como referente del mercado premium.' },
+      { title: 'Fotógrafo Automotriz', location: 'Viña del Mar / Santiago', desc: 'Sesiones fotográficas profesionales de los vehículos para web y redes sociales. Portfolio automotriz requerido.' }
+    ];
+
+    document.getElementById('jobsGrid').innerHTML = jobs.map(j => `
+      <div class="job-card">
+        <div class="job-title">${j.title}</div>
+        <div class="job-location">${ICONS.pin} ${j.location}</div>
+        <div class="job-desc">${j.desc}</div>
+        <a href="mailto:${RM_CONFIG.emailHR}?subject=${encodeURIComponent('Postulación: ' + j.title)}" class="btn-gold" style="font-size:12px;padding:10px 20px">Postular</a>
+      </div>
+    `).join('');
+
+    document.getElementById('cvBtn').href = `mailto:${RM_CONFIG.emailHR}?subject=CV%20Espont%C3%A1neo`;
+  </script>
+</body>
+</html>

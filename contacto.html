@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contacto — Royal Motors</title>
+  <meta name="description" content="Contáctanos para conocer nuestros vehículos premium disponibles.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <section class="page-hero">
+    <div>
+      <div class="section-tag">Contacto</div>
+      <h1 class="page-hero-title">Hablemos</h1>
+      <p class="page-hero-sub">Estamos aquí para ayudarte. Contáctanos por el medio que prefieras.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="contact-grid">
+      <div>
+        <h3 style="font-family:var(--font-display);font-size:24px;margin-bottom:24px">Envíanos un mensaje</h3>
+
+        <div id="successBox" style="display:none;background:var(--bg-card);border:1px solid rgba(200,169,110,0.3);padding:40px;text-align:center">
+          <div id="successIcon" style="color:var(--gold);margin-bottom:12px"></div>
+          <p style="font-family:var(--font-display);font-size:20px;margin-bottom:8px">Mensaje enviado</p>
+          <p style="color:var(--gray);font-size:14px">Te responderemos a la brevedad.</p>
+        </div>
+
+        <form id="contactForm" action="https://formspree.io/f/TU_FORMSPREE_ID" method="POST">
+          <div class="form-group">
+            <label class="form-label" for="name">Nombre completo</label>
+            <input class="form-input" type="text" id="name" name="nombre" placeholder="Tu nombre" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="email">Correo electrónico</label>
+            <input class="form-input" type="email" id="email" name="email" placeholder="tu@email.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="phone">Teléfono</label>
+            <input class="form-input" type="tel" id="phone" name="telefono" placeholder="+56 9 ...">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="message">Mensaje</label>
+            <textarea class="form-textarea" id="message" name="mensaje" placeholder="¿En qué podemos ayudarte?" required></textarea>
+          </div>
+          <button type="submit" class="btn-gold">Enviar Mensaje</button>
+        </form>
+      </div>
+
+      <div>
+        <h3 style="font-family:var(--font-display);font-size:24px;margin-bottom:24px">Información de contacto</h3>
+        <div id="contactInfo"></div>
+
+        <div style="margin-top:32px;padding:24px;background:var(--bg-card);border:1px solid var(--border)">
+          <p style="font-family:var(--font-display);font-size:18px;margin-bottom:8px">¿Prefieres una respuesta inmediata?</p>
+          <p style="color:var(--gray);font-size:14px;margin-bottom:16px">Escríbenos directo por WhatsApp.</p>
+          <a id="contactWa" href="#" target="_blank" rel="noopener" class="modal-wa" style="font-size:13px;padding:10px 20px"></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/app.js"></script>
+  <script>
+    initPage('contacto');
+
+    document.getElementById('successIcon').innerHTML = ICONS.check;
+
+    // Info de contacto
+    const info = [
+      { icon: ICONS.pin, label: 'Ubicación', value: RM_CONFIG.location },
+      { icon: ICONS.phone, label: 'WhatsApp', value: `<a href="${getWhatsAppUrl()}" target="_blank" rel="noopener">${RM_CONFIG.phone}</a>` },
+      { icon: ICONS.mail, label: 'Email', value: RM_CONFIG.email },
+      { icon: ICONS.clock, label: 'Horario', value: RM_CONFIG.hours.replace('\n', '<br>') }
+    ];
+    document.getElementById('contactInfo').innerHTML = info.map(i => `
+      <div class="contact-info-item">
+        <div class="contact-info-icon">${i.icon}</div>
+        <div>
+          <div class="contact-info-label">${i.label}</div>
+          <div class="contact-info-value">${i.value}</div>
+        </div>
+      </div>
+    `).join('');
+
+    // Link de WhatsApp
+    const waLink = document.getElementById('contactWa');
+    waLink.href = getWhatsAppUrl();
+    waLink.innerHTML = ICONS.whatsapp + ' Abrir WhatsApp';
+
+    // Manejo del formulario (Formspree)
+    const form = document.getElementById('contactForm');
+    const successBox = document.getElementById('successBox');
+    form.addEventListener('submit', async (e) => {
+      // Si aún no configuraron Formspree, enviamos por mailto como fallback
+      if (form.action.includes('TU_FORMSPREE_ID')) {
+        e.preventDefault();
+        const data = new FormData(form);
+        const mailto = `mailto:${RM_CONFIG.email}?subject=Contacto desde la web&body=${encodeURIComponent(
+          `Nombre: ${data.get('nombre')}\nEmail: ${data.get('email')}\nTeléfono: ${data.get('telefono') || '—'}\n\nMensaje:\n${data.get('mensaje')}`
+        )}`;
+        window.location.href = mailto;
+        return;
+      }
+      // Si Formspree está configurado, envía vía fetch
+      e.preventDefault();
+      const data = new FormData(form);
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          body: data,
+          headers: { 'Accept': 'application/json' }
+        });
+        if (res.ok) {
+          form.style.display = 'none';
+          successBox.style.display = 'block';
+        } else {
+          alert('Error al enviar el formulario. Intenta por WhatsApp.');
+        }
+      } catch (err) {
+        alert('Error de conexión. Intenta por WhatsApp.');
+      }
+    });
+  </script>
+</body>
+</html>
