@@ -733,3 +733,13 @@ button { font-family: inherit; cursor: pointer; }
   .dash-stats { grid-template-columns: 1fr 1fr; }
   .page-hero { padding: 72px 24px 0; }
 }
+.final-cta-section{
+  padding: 0 80px 100px;
+  background: var(--bg);
+}
+
+@media (max-width:768px){
+  .final-cta-section{
+    padding: 0 24px 60px;
+  }
+}
