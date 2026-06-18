@@ -1,0 +1,10 @@
+User-agent: *
+
+# Bloquear administración
+Disallow: /admin.html
+
+# Permitir el resto del sitio
+Allow: /
+
+# Sitemap
+Sitemap: https://royalmotors.cl/sitemap.xml

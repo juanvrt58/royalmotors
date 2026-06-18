@@ -173,8 +173,8 @@ function renderFooter() {
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2025 Royal Motors. Todos los derechos reservados.</span>
-      <a href="admin.html" class="footer-link" style="margin:0">Administración</a>
+      <span>© 2026 Royal Motors. Todos los derechos reservados. Desarrollado por Juan Vial R-T • +56 9 9199 9301</span>
+
     </div>
   `;
   document.body.appendChild(footer);
